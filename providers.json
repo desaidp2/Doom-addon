@@ -1,6 +1,6 @@
 {
   "name": "Doom-addon",
-  "version": "3.0.9",
+  "version": "3.0.10",
   "scrapers": [
     {
       "id": "4khdhub",
@@ -1006,7 +1006,7 @@
       "id": "vegamovies",
       "name": "VegaMovies",
       "description": "VegaMovies streams synced from D3adlyRocket/All-in-One-Nuvio, filtered to Hindi/English 720p through 4K playable and seekable links",
-      "version": "2.0.8",
+      "version": "2.0.9",
       "author": "ummarm",
       "supportedTypes": [
         "movie",
