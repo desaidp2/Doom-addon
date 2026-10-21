@@ -278,23 +278,6 @@ async function handleAioRedirect(response, token) {
   response.end();
 }
 
-// Display-only Neo Rain theme. Preserve stream names, playback and all other fields.
-function neoRainStreamPreview(streams) {
-  return streams.map((stream) => {
-    if (!stream || typeof stream !== "object") return stream;
-    const originalTitle = typeof stream.title === "string" ? stream.title : "";
-    const originalDescription = typeof stream.description === "string" ? stream.description : "";
-    const originalText = originalTitle || originalDescription;
-    if (!originalText || originalText.startsWith("🕶️ NEO")) return stream;
-    const header = "🕶️ NEO │ 🟩 MATRIX // SYSTEM ONLINE\n🐇 FOLLOW THE WHITE RABBIT\n";
-    // Never modify name, URL, infoHash, behaviorHints, sources, or ordering.
-    return Object.assign({}, stream, {
-      title: header + originalText,
-      ...(originalDescription ? { description: header + originalDescription } : {})
-    });
-  });
-}
-
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host || "localhost"}`);
@@ -404,7 +387,7 @@ const server = http.createServer(async (request, response) => {
       const responseStreams = scopeHasProvider(streamRequest.scope, "aiostreams")
         ? redirectAioStreams(streams, streamRequest, url.origin)
         : streams;
-      sendJson(response, 200, { streams: neoRainStreamPreview(responseStreams) }, cacheSeconds);
+      sendJson(response, 200, { streams: responseStreams }, cacheSeconds);
       return;
     }
 
