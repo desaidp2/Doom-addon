@@ -286,10 +286,10 @@ function matrixDisplayStreams(streams) {
     const originalName = String(stream.name || "");
     const originalDetails = String(stream.description || stream.title || "");
     const evidence = [originalName, originalDetails, String(stream.behaviorHints && stream.behaviorHints.filename || "")].join(" ");
-    const quality = /\\b(?:2160p|4k|uhd)\\b/i.test(evidence) ? "💎 4K UHD"
-      : /\\b1080p\\b/i.test(evidence) ? "🟢 1080P"
-      : /\\b720p\\b/i.test(evidence) ? "🔵 720P"
-      : /\\b480p\\b/i.test(evidence) ? "🟡 480P" : "🎞️ AUTO";
+    const quality = /\b(?:2160p|4k|uhd)\b/i.test(evidence) ? "💎 4K UHD"
+      : /\b1080p\b/i.test(evidence) ? "🟢 1080P"
+      : /\b720p\b/i.test(evidence) ? "🔵 720P"
+      : /\b480p\b/i.test(evidence) ? "🟡 480P" : "🎞️ AUTO";
     const source = providerId === "torbox" ? "☁️ TORBOX"
       : providerId === "mediafusion" ? "🔗 MEDIAFUSION"
       : providerId === "aiostreams" ? "🔗 AIOSTREAMS"
