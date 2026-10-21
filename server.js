@@ -387,7 +387,16 @@ const server = http.createServer(async (request, response) => {
       const responseStreams = scopeHasProvider(streamRequest.scope, "aiostreams")
         ? redirectAioStreams(streams, streamRequest, url.origin)
         : streams;
-      sendJson(response, 200, { streams: responseStreams }, cacheSeconds);
+            // Batman trial is opt-in and isolated to this test branch/service.
+      // Preserve the original stream name, URL and metadata fields.
+      const batmanStreams = process.env.BATMAN_TEST === "1"
+        ? responseStreams.map((stream) => {
+          if (!stream || typeof stream !== "object") return stream;
+          const original = typeof stream.title === "string" ? stream.title : "";
+          return { ...stream, title: "🦇 GOTHAM NETWORK // ONLINE\n" + original + "\n⟩ I AM VENGEANCE" };
+        })
+        : responseStreams;
+      sendJson(response, 200, { streams: batmanStreams }, cacheSeconds);
       return;
     }
 
