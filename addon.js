@@ -2093,7 +2093,17 @@ function normalizeStream(rawStream, provider, mediaInfo) {
   const behaviorHints = Object.assign({}, rawStream.behaviorHints || {});
   const detectedSize = streamSizeBytes(rawStream);
   const detailDescription = streamDetailDescription(rawStream, provider);
-  const description = detailDescription || rawStream.description || rawStream.title || nameParts.join(" | ");
+  const qualityLabel = streamQualityLabel(rawStream);
+  const qualityBadge = qualityLabel === "2160p" ? "💎 4K UHD" : qualityLabel === "1080p" ? "🟢 1080P" : qualityLabel === "720p" ? "🔵 720P" : qualityLabel ? `🎞️ ${qualityLabel.toUpperCase()}` : "🎞️ AUTO";
+  const neonName = `⚡ DOOM │ ${qualityBadge} │ 🌐 HTTP`;
+  const mediaTitle = streamDisplayTitle(rawStream, mediaInfo);
+  const neonDetails = detailDescription
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => line.startsWith("⚡ ") ? line.replace(/^⚡ /, "🚀 ") : line)
+    .join("\n");
+  const description = [mediaTitle ? `🎬 ${mediaTitle}` : "", neonDetails].filter(Boolean).join("\n")
+    || rawStream.description || rawStream.title || nameParts.join(" | ");
   const filename = streamFileName(rawStream);
 
   if (filename && !behaviorHints.filename) {
@@ -2116,7 +2126,7 @@ function normalizeStream(rawStream, provider, mediaInfo) {
   }
 
   return {
-    name: cleanStreamName(rawStream, mediaInfo) || nameWithQuality(rawStream.name || nameParts.join(" | ") || provider.name, rawStream),
+    name: neonName,
     title: description,
     description,
     url: targetUrl,
