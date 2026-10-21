@@ -278,6 +278,36 @@ async function handleAioRedirect(response, token) {
   response.end();
 }
 
+// Display-only Matrix theme: never alter playback URLs, stream ordering, or metadata hints.
+function matrixDisplayStreams(streams) {
+  return streams.map((stream) => {
+    if (!stream || typeof stream !== "object") return stream;
+    const providerId = String(stream.behaviorHints && stream.behaviorHints.doomProviderId || "").toLowerCase();
+    const originalName = String(stream.name || "");
+    const originalDetails = String(stream.description || stream.title || "");
+    const evidence = [originalName, originalDetails, String(stream.behaviorHints && stream.behaviorHints.filename || "")].join(" ");
+    const quality = /\\b(?:2160p|4k|uhd)\\b/i.test(evidence) ? "💎 4K UHD"
+      : /\\b1080p\\b/i.test(evidence) ? "🟢 1080P"
+      : /\\b720p\\b/i.test(evidence) ? "🔵 720P"
+      : /\\b480p\\b/i.test(evidence) ? "🟡 480P" : "🎞️ AUTO";
+    const source = providerId === "torbox" ? "☁️ TORBOX"
+      : providerId === "mediafusion" ? "🔗 MEDIAFUSION"
+      : providerId === "aiostreams" ? "🔗 AIOSTREAMS"
+      : providerId ? `🌐 ${providerId.toUpperCase()}` : "🔗 STREAM";
+    const name = `🕶️ NEO // DOOM.exe │ ${quality}`;
+    const description = [
+      "🟩 ▣ ENTER THE MATRIX",
+      `💊 🔴 RED PILL │ ${quality}`,
+      `🕶️ NEO VISION │ ${source}`,
+      "🐇 FOLLOW THE WHITE RABBIT",
+      originalName ? `🎬 ${originalName}` : "",
+      originalDetails,
+      "⟩ WELCOME TO THE REAL WORLD"
+    ].filter(Boolean).join("\n");
+    return Object.assign({}, stream, { name, title: description, description });
+  });
+}
+
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host || "localhost"}`);
@@ -387,7 +417,7 @@ const server = http.createServer(async (request, response) => {
       const responseStreams = scopeHasProvider(streamRequest.scope, "aiostreams")
         ? redirectAioStreams(streams, streamRequest, url.origin)
         : streams;
-      sendJson(response, 200, { streams: responseStreams }, cacheSeconds);
+      sendJson(response, 200, { streams: matrixDisplayStreams(responseStreams) }, cacheSeconds);
       return;
     }
 
