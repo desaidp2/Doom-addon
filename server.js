@@ -299,16 +299,16 @@ function johnWickCard(stream) {
   const name = tier ? tier[1] : "❓ EXCOMMUNICADO • UNKNOWN";
   const quote = tier ? tier[2] : "Contract activated.";
   // Keep the original technical metadata, but remove duplicated filename text.
-  const lines = originalTitle.split(/\\r?\\n/).map((line) => line.trim()).filter(Boolean);
+  const lines = originalTitle.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const seen = new Set();
   const details = lines.filter((line) => {
-    const normalized = line.toLowerCase().replace(/\\s+/g, " ");
+    const normalized = line.toLowerCase().replace(/\s+/g, " ");
     if (seen.has(normalized)) return false;
     seen.add(normalized);
     // Long release filenames make stream cards unreadable; preserve short metadata lines.
-    if (line.length > 115 && /\\.(?:mkv|mp4|avi)\\b/i.test(line)) return false;
+    if (line.length > 115 && /\.(?:mkv|mp4|avi)\b/i.test(line)) return false;
     return true;
-  }).slice(0, 7).join("\\n") || originalName;
+  }).slice(0, 7).join("\n") || originalName;
   return Object.assign({}, stream, {
     name: name,
     title: [quote, "📡 DOOM", details].filter(Boolean).join("\n"),
