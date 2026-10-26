@@ -278,6 +278,34 @@ async function handleAioRedirect(response, token) {
   response.end();
 }
 
+// John Wick stream-card presentation only. Never changes stream URLs or playback hints.
+function johnWickCard(stream) {
+  if (!stream || typeof stream !== "object") return stream;
+  const originalName = String(stream.name || "");
+  const originalTitle = String(stream.title || stream.description || "");
+  const filename = String((stream.behaviorHints && stream.behaviorHints.filename) || "");
+  const searchable = [originalName, originalTitle, filename].join(" ");
+  const tiers = [
+    [/\b(?:4320p|8k)\b/i, "👑 HIGH TABLE • 8K", "Rules are rules."],
+    [/\b(?:2160p|4k|uhd)\b/i, "🐺 JOHN WICK • 4K", "Yeah, I'm thinking I'm back!"],
+    [/\b1440p\b/i, "🪙 CONTINENTAL • QHD", "No business on Continental grounds."],
+    [/\b(?:1080p|fhd|full hd)\b/i, "✏️ BABA YAGA • 1080P", "Be seeing you."],
+    [/\b720p\b/i, "🕴️ CAINE • 720P", "Consequences."],
+    [/\b576p\b/i, "🥃 WINSTON • 576P", "Welcome to the Continental."],
+    [/\b480p\b/i, "🐕 MR. NOBODY • 480P", "Every dog has its day."],
+    [/\b360p\b/i, "🎩 BOWERY KING • 360P", "Are you ready, John?"]
+  ];
+  const tier = tiers.find(([pattern]) => pattern.test(searchable));
+  const name = tier ? tier[1] : "❓ EXCOMMUNICADO • UNKNOWN";
+  const quote = tier ? tier[2] : "Contract activated.";
+  const details = originalTitle || originalName;
+  return Object.assign({}, stream, {
+    name: name,
+    title: [quote, "📡 DOOM", details].filter(Boolean).join("\n"),
+    ...(stream.description !== undefined ? { description: [quote, "📡 DOOM", details].filter(Boolean).join("\n") } : {})
+  });
+}
+
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host || "localhost"}`);
@@ -387,7 +415,7 @@ const server = http.createServer(async (request, response) => {
       const responseStreams = scopeHasProvider(streamRequest.scope, "aiostreams")
         ? redirectAioStreams(streams, streamRequest, url.origin)
         : streams;
-      sendJson(response, 200, { streams: responseStreams }, cacheSeconds);
+      sendJson(response, 200, { streams: responseStreams.map(johnWickCard) }, cacheSeconds);
       return;
     }
 
