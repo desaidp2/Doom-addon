@@ -1361,47 +1361,8 @@ async function probeStream(stream, options = {}) {
 }
 
 async function filterPlayableStreams(streams, options = {}) {
-  const filtered = [];
-  let nextIndex = 0;
-  const probeOnlyRequired = Boolean(options.probeOnlyRequired);
-  const probeTimeoutMs = options.probeTimeoutMs || STREAM_PROBE_TIMEOUT_MS;
-
-  async function worker() {
-    while (nextIndex < streams.length) {
-      const stream = streams[nextIndex];
-      nextIndex += 1;
-      try {
-        if (probeOnlyRequired && !streamRequiresProbe(stream)) {
-          if (isFastAcceptableStream(stream)) {
-            filtered.push(stream);
-          } else {
-            console.log(`[Stream probe] Rejected unlikely source: ${stream.name}`);
-          }
-          continue;
-        }
-
-        const probe = await probeStream(stream, {
-          timeoutMs: probeTimeoutMs,
-          mediaInfo: options.mediaInfo,
-          parsed: options.parsed
-        });
-        if (probe.ok) {
-          filtered.push(stream);
-        } else {
-          console.log(`[Stream probe] Rejected unplayable source: ${stream.name}`);
-        }
-      } catch (error) {
-        console.log(`[Stream probe] Rejected ${stream.name}: ${error.message || error}`);
-      }
-    }
-  }
-
-  const workers = Array.from(
-    { length: Math.min(STREAM_PROBE_CONCURRENCY, streams.length) },
-    () => worker()
-  );
-  await Promise.all(workers);
-  return filtered;
+  console.log(`[OPEN FILTER TEST] Playback probe bypassed for ${streams.length} streams`);
+  return streams;
 }
 
 const UMBRELLA_PROVIDER_CODES = {
@@ -2268,13 +2229,8 @@ function streamsFromProviderResults(providerResults, options = {}) {
 }
 
 function filterRequestedMediaStreams(streams, mediaInfo, parsed) {
-  return streams.filter((stream) => {
-    if (matchesRequestedMedia(stream, mediaInfo, parsed)) {
-      return true;
-    }
-    console.log(`[Media match] Rejected wrong-title stream: ${stream.name}`);
-    return false;
-  });
+  console.log(`[OPEN FILTER TEST] Title filter bypassed for ${streams.length} streams`);
+  return streams;
 }
 
 function compareStreamSizesAscending(a, b) {
@@ -2370,13 +2326,15 @@ async function finalizeStreams(providerResults, options = {}) {
   const passthrough = streams.filter(isPassthroughStream);
   const regularStreams = streams.filter((stream) => !isPassthroughStream(stream));
   const mediaMatchedStreams = filterRequestedMediaStreams(regularStreams, options.mediaInfo, options.parsed);
-  const playableStreams = await filterPlayableStreams(dedupeStreams(mediaMatchedStreams), {
+  const dedupedStreams = dedupeStreams(mediaMatchedStreams);
+  const playableStreams = await filterPlayableStreams(dedupedStreams, {
     mediaInfo: options.mediaInfo,
     parsed: options.parsed,
     probeOnlyRequired: options.probeOnlyRequired,
     probeTimeoutMs: options.probeTimeoutMs
   });
   const qualityMatchedStreams = filterStreamsByQualityBand([...playableStreams, ...passthrough], options.qualityBand);
+  console.log(`[OPEN FILTER TRACE] raw=${streams.length} passthrough=${passthrough.length} regular=${regularStreams.length} titleMatched=${mediaMatchedStreams.length} deduped=${dedupedStreams.length} probed=${playableStreams.length} quality=${qualityMatchedStreams.length} band=${options.qualityBand || "all"}`);
   return sortStreams(qualityMatchedStreams, { qualityBand: options.qualityBand });
 }
 
