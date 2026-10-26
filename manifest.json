@@ -1,7 +1,7 @@
 {
-  "id": "community.doomplug",
+  "id": "community.doomplug.johnwicktest",
   "version": "3.0.10",
-  "name": "Doom-addon",
+  "name": "DOOM • John Wick",
   "description": "A Stremio stream add-on wrapping the Doom-addon provider set: 4KHDHub, 4khdhub-tv, 4KHDHub Yoruix, HDHub4u, HDHub4u Murph, MovieBox Murph, Movies4u Murph, HDHub4u Yoruix, MovieBox Yoruix, UHDMovies Yoruix, MovieBlast Yoruix, Flix-Streams Emby, Flix-Streams MkvCinemas, Flix-Streams LotusVault, Flix-Streams ArchiveVault, Flix-Streams UHDMovies, Flix-Streams 4KHDHub, Flix-Streams HDHub4u, Flix-Streams Debrid Vault, Flix-Streams Signal Vault, Flix-Streams Usenet Vault, Flix-Streams Stream Vault, Flix-Streams Other, Flix-Streams VegaMovies, CineFreak, FibWatch, PlayIMDb, WebStreamrMBG, Torbox, Pengu, HindMoviez, MovieBlast, 4KHDHub Murph, MovieBox, 4KHDHub-NEW, MovieBox-Hindi, Movies4u, UHDMovies, MoviesDrive, Peachify, VegaMovies, VidLink.",
   "resources": [
     {
@@ -23,7 +23,7 @@
     "tt"
   ],
   "catalogs": [],
-  "logo": "https://doom-addon.zxflix.com/assets/umbrella-icon.png",
+  "logo": "https://doom-john-wick-test.onrender.com/assets/john-wick-target.svg",
   "behaviorHints": {
     "configurable": false,
     "p2p": false
