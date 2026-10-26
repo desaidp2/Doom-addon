@@ -2326,13 +2326,15 @@ async function finalizeStreams(providerResults, options = {}) {
   const passthrough = streams.filter(isPassthroughStream);
   const regularStreams = streams.filter((stream) => !isPassthroughStream(stream));
   const mediaMatchedStreams = filterRequestedMediaStreams(regularStreams, options.mediaInfo, options.parsed);
-  const playableStreams = await filterPlayableStreams(dedupeStreams(mediaMatchedStreams), {
+  const dedupedStreams = dedupeStreams(mediaMatchedStreams);
+  const playableStreams = await filterPlayableStreams(dedupedStreams, {
     mediaInfo: options.mediaInfo,
     parsed: options.parsed,
     probeOnlyRequired: options.probeOnlyRequired,
     probeTimeoutMs: options.probeTimeoutMs
   });
   const qualityMatchedStreams = filterStreamsByQualityBand([...playableStreams, ...passthrough], options.qualityBand);
+  console.log(`[OPEN FILTER TRACE] raw=${streams.length} passthrough=${passthrough.length} regular=${regularStreams.length} titleMatched=${mediaMatchedStreams.length} deduped=${dedupedStreams.length} probed=${playableStreams.length} quality=${qualityMatchedStreams.length} band=${options.qualityBand || "all"}`);
   return sortStreams(qualityMatchedStreams, { qualityBand: options.qualityBand });
 }
 
