@@ -1,0 +1,1 @@
+{"name":"flixstreams-seven-test","version":"0.1.0","private":true,"scripts":{"start":"node flix-seven-server.js"},"engines":{"node":">=18"}}
