@@ -19,7 +19,7 @@ http.createServer(async(req,res)=>{
    const desc=String(s.description||"");
    const title=String(s.title||"");
    const source=String(s.provider||s.providerId||s.source||"");
-   return /torbox/i.test([name,desc,title,source].join(" "))||/^TB(?:\\b|[|:\\s-])/i.test(name);
+   return /torbox/i.test([name,desc,title,source].join(" "))||/^TB(?:\b|[|:\s-])/i.test(name);
   });
   send(res,200,{streams});
  }catch(e){send(res,502,{streams:[],error:String(e.message||e)});}
