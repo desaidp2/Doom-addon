@@ -2,13 +2,13 @@ const http = require("node:http");
 const PORT = Number(process.env.PORT || 3000);
 const UPSTREAM = (process.env.FLIX_UPSTREAM_URL || "").replace(/\/+$/, "");
 const groups = [
- ["Emby / Media Lib", /(?:flix.streams.{0,24}emby|media.lib|\\bEMB\\b)/i],
- ["Signal Vault", /(?:flix.streams.{0,24}signal|signal.vault|\\bSV F\\b)/i],
+ ["Emby / Media Lib", /(?:flix.streams.{0,24}emby|media.lib|\bEMB\b)/i],
+ ["Signal Vault", /(?:flix.streams.{0,24}signal|signal.vault|\bSV F\b)/i],
  ["Debrid Vault Turbo", /(?:debrid.vault.turbo|debrid.turbo)/i],
- ["Debrid Vault", /(?:flix.streams.{0,24}debrid|debrid.vault|\\bDBV F\\b)/i],
- ["Usenet Vault", /(?:flix.streams.{0,24}usenet|usenet.vault|\\bUV F\\b)/i],
- ["Lotus Vault", /(?:flix.streams.{0,24}lotus|lotus.vault|\\bLV\\b)/i],
- ["Archive Vault", /(?:flix.streams.{0,24}archive|archive.vault|\\bAV\\b)/i]
+ ["Debrid Vault", /(?:flix.streams.{0,24}debrid|debrid.vault|\bDBV F\b)/i],
+ ["Usenet Vault", /(?:flix.streams.{0,24}usenet|usenet.vault|\bUV F\b)/i],
+ ["Lotus Vault", /(?:flix.streams.{0,24}lotus|lotus.vault|\bLV\b)/i],
+ ["Archive Vault", /(?:flix.streams.{0,24}archive|archive.vault|\bAV\b)/i]
 ];
 const manifest = {id:"community.flixstreams.seven",version:"0.1.0",name:"Flix-Streams Seven Test",description:"Flix-Streams only: seven source labels filtered from configured upstream.",resources:["stream"],types:["movie","series"],catalogs:[],idPrefixes:["tt"]};
 const reply=(res,status,body)=>{res.writeHead(status,{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"});res.end(JSON.stringify(body));};
