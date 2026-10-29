@@ -10,7 +10,7 @@ const groups = [
  ["Lotus Vault", /(?:flix.streams.{0,24}lotus|lotus.vault|\bLV\b)/i],
  ["Archive Vault", /(?:flix.streams.{0,24}archive|archive.vault|\bAV\b)/i]
 ];
-const manifest = {id:"community.flixstreams.seven",version:"0.1.0",name:"Flix-Streams Seven Test",description:"Flix-Streams only: seven source labels filtered from configured upstream.",resources:["stream"],types:["movie","series"],catalogs:[],idPrefixes:["tt"]};
+const manifest = {id:"community.flixstreams.seven",version:"0.2.0",name:"Flix-Streams Seven Test",description:"Test passthrough: all upstream stream entries, no provider filtering.",resources:["stream"],types:["movie","series"],catalogs:[],idPrefixes:["tt"]};
 const reply=(res,status,body)=>{res.writeHead(status,{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"});res.end(JSON.stringify(body));};
 http.createServer(async(req,res)=>{
  const path=new URL(req.url,"http://localhost").pathname;
@@ -24,12 +24,7 @@ http.createServer(async(req,res)=>{
   const r=await fetch(u,{signal:AbortSignal.timeout(18000)});
   if(!r.ok)return reply(res,502,{streams:[],error:"Upstream HTTP "+r.status});
   const data=await r.json();
-  const streams=(Array.isArray(data.streams)?data.streams:[]).flatMap(s=>{
-   if(!s||typeof s.url!=="string"||!/^https?:\/\//.test(s.url))return [];
-   const label=[s.name,s.title,s.description].filter(Boolean).join(" ");
-   const group=groups.find(([_,re])=>re.test(label));
-   return group?[{...s,name:"["+group[0]+"] "+(s.name||"HTTP")}]:[];
-  });
+  const streams=Array.isArray(data.streams)?data.streams:[];
   reply(res,200,{streams});
  }catch(e){reply(res,502,{streams:[],error:String(e.message||e)});}
 }).listen(PORT,"0.0.0.0");
