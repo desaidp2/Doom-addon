@@ -11,7 +11,7 @@ function keep(s){
  const hints=String(s.behaviorHints?.bingeGroup||"").toLowerCase();
  if(/doomp-(?:torbox|flix_streams_)/.test(hints))return false;
  const label=[s.name,s.description].filter(Boolean).join(" ");
- return !/(?:torbox|flix.streams|\\bTB\\b|\\b(?:EMB|SV F|UV F|DBV F|STV F)\\b)/i.test(label);
+ return !/(?:torbox|flix.streams|\bTB\b|\b(?:EMB|SV F|UV F|DBV F|STV F)\b)/i.test(label);
 }
 http.createServer(async(req,res)=>{
  const path=new URL(req.url,"http://localhost").pathname;
