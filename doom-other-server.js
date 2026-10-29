@@ -13,6 +13,8 @@ function keep(s){
  const label=[s.name,s.description].filter(Boolean).join(" ");
  return !/(?:torbox|flix.streams|\bTB\b|\b(?:EMB|SV F|UV F|DBV F|STV F)\b)/i.test(label);
 }
+function qualityRank(s){const t=[s?.name,s?.title,s?.description,s?.quality,s?.behaviorHints?.filename].filter(Boolean).join(" ");if(/(?:2160p|4k|uhd)/i.test(t))return 0;if(/(?:1080p|full.?hd|fhd)/i.test(t))return 1;if(/720p/i.test(t))return 2;if(/480p/i.test(t))return 3;return 4;}
+function sortQuality(streams){return streams.slice().sort((a,b)=>qualityRank(a)-qualityRank(b));}
 http.createServer(async(req,res)=>{
  const path=new URL(req.url,"http://localhost").pathname;
  if(path==="/manifest.json"||path==="/")return send(res,200,manifest);
@@ -26,6 +28,6 @@ http.createServer(async(req,res)=>{
   const all=Array.isArray(data.streams)?data.streams:[];
   const streams=all.filter(keep);
   console.log("[Other Sources]",m[2],"total",all.length,"kept",streams.length);
-  send(res,200,{streams});
+  send(res,200,{streams:sortQuality(streams)});
  }catch(e){console.error("[Other Sources]",e.message);send(res,502,{streams:[],error:e.message});}
 }).listen(PORT,"0.0.0.0");
