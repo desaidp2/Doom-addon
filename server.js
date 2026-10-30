@@ -398,7 +398,11 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(PORT, HOST, () => {
-  const displayHost = HOST === "0.0.0.0" ? "localhost" : HOST;
-  console.log(`Doom-addon Stremio add-on listening on http://${displayHost}:${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, HOST, () => {
+    const displayHost = HOST === "0.0.0.0" ? "localhost" : HOST;
+    console.log(`Doom-addon Stremio add-on listening on http://${displayHost}:${PORT}`);
+  });
+}
+
+module.exports = server;
