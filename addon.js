@@ -2326,7 +2326,10 @@ async function finalizeStreams(providerResults, options = {}) {
   const passthrough = streams.filter(isPassthroughStream);
   const regularStreams = streams.filter((stream) => !isPassthroughStream(stream));
   const mediaMatchedStreams = filterRequestedMediaStreams(regularStreams, options.mediaInfo, options.parsed);
-  const dedupedStreams = dedupeStreams(mediaMatchedStreams);
+  // If title matching rejects every candidate, keep provider results instead of showing no links.
+  // Preserve normal title matching whenever it finds at least one candidate.
+  const selectedStreams = mediaMatchedStreams.length ? mediaMatchedStreams : regularStreams;
+  const dedupedStreams = dedupeStreams(selectedStreams);
   const playableStreams = await filterPlayableStreams(dedupedStreams, {
     mediaInfo: options.mediaInfo,
     parsed: options.parsed,
