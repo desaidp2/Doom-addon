@@ -387,7 +387,16 @@ const server = http.createServer(async (request, response) => {
       const responseStreams = scopeHasProvider(streamRequest.scope, "aiostreams")
         ? redirectAioStreams(streams, streamRequest, url.origin)
         : streams;
-      sendJson(response, 200, { streams: responseStreams }, cacheSeconds);
+      const sourceLabel = process.env.DOOM_PROVIDER_MODE === "flix" ? "Doom FlixStreams"
+        : process.env.DOOM_PROVIDER_MODE === "torbox" ? "Doom Torbox"
+        : process.env.DOOM_PROVIDER_MODE === "lite" || process.env.DOOM_EXCLUDE_FLIXSTREAMS_TORBOX === "1" ? "Doom Lite"
+        : "";
+      const labeledStreams = sourceLabel ? responseStreams.map((stream) => ({
+        ...stream,
+        name: sourceLabel + " | " + (stream.name || "Stream"),
+        title: stream.title ? sourceLabel + " | " + stream.title : stream.title
+      })) : responseStreams;
+      sendJson(response, 200, { streams: labeledStreams }, cacheSeconds);
       return;
     }
 
