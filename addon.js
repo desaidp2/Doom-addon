@@ -133,8 +133,10 @@ const nuvioLiveCatalogs = [
 ];
 const liveCatalogs = [...sportsFreeLiveCatalogs, ...nuvioLiveCatalogs];
 
+const EXCLUDE_FLIXSTREAMS_AND_TORBOX = process.env.DOOM_EXCLUDE_FLIXSTREAMS_TORBOX === "1";
 const providerEntries = providerRegistry.scrapers
   .filter((provider) => provider.enabled)
+  .filter((provider) => !EXCLUDE_FLIXSTREAMS_AND_TORBOX || (!provider.id.startsWith("flix_streams_") && provider.id !== "torbox"))
   .map((provider) => ({
     id: provider.id,
     name: provider.name,
