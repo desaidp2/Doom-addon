@@ -2,12 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "includeFiles": [
-        "providers/**",
-        "providers.json",
-        "manifest.json",
-        "assets/**"
-      ]
+      "includeFiles": "{providers/**,providers.json,manifest.json,assets/**}"
     }
   },
   "rewrites": [
