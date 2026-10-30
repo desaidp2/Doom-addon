@@ -134,6 +134,21 @@ const nuvioLiveCatalogs = [
 const liveCatalogs = [...sportsFreeLiveCatalogs, ...nuvioLiveCatalogs];
 
 const PROVIDER_MODE = process.env.DOOM_PROVIDER_MODE || (process.env.DOOM_EXCLUDE_FLIXSTREAMS_TORBOX === "1" ? "lite" : "all");
+const addonIdentity = {
+  lite: { id: "community.doomplug.lite", name: "Doom Lite" },
+  flix: { id: "community.doomplug.flixstreams", name: "Doom FlixStreams" },
+  torbox: { id: "community.doomplug.torboxonly", name: "Doom Torbox" }
+}[PROVIDER_MODE];
+if (addonIdentity) {
+  manifest.id = addonIdentity.id;
+  manifest.name = addonIdentity.name;
+  const activeProviders = providerRegistry.scrapers.filter((provider) => provider.enabled && (
+    PROVIDER_MODE === "lite" ? !provider.id.startsWith("flix_streams_") && provider.id !== "torbox"
+    : PROVIDER_MODE === "flix" ? provider.id.startsWith("flix_streams_")
+    : provider.id === "torbox"
+  ));
+  manifest.description = addonIdentity.name + " — " + activeProviders.length + " enabled provider(s): " + activeProviders.map((provider) => provider.name).join(", ") + ".";
+}
 const providerEntries = providerRegistry.scrapers
   .filter((provider) => provider.enabled)
   .filter((provider) => {
