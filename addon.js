@@ -275,6 +275,7 @@ const streamInflight = new Map();
 const liveStreamCache = new Map();
 const passthroughProviderIds = new Set(["mediafusion", "aiostreams", "torbox"]);
 const passthroughStreams = new WeakSet();
+const originalMatchEvidence = new WeakMap();
 
 function isSportsFreeLiveId(id) {
   return /^(?:streamed|sf|recap|leaf):/i.test(String(id || ""));
@@ -1633,6 +1634,9 @@ function streamEvidenceTokens(value) {
 }
 
 function streamMediaEvidence(stream) {
+  if (originalMatchEvidence.has(stream)) {
+    return originalMatchEvidence.get(stream);
+  }
   return [
     stream.behaviorHints && stream.behaviorHints.filename,
     stream.title,
@@ -2149,13 +2153,22 @@ function normalizeStream(rawStream, provider, mediaInfo) {
     };
   }
 
-  return {
+  const normalizedStream = {
     name: cleanStreamName(rawStream, mediaInfo) || nameWithQuality(rawStream.name || nameParts.join(" | ") || provider.name, rawStream),
     title: description,
     description,
     url: targetUrl,
     behaviorHints
   };
+
+  // Pengu sometimes supplies only quality/codec metadata as the filename;
+  // retain its real title description for matching, not the generated card.
+  if (provider.id === "pengu" && /^(?:4k|(?:2160|1440|1080|720|480|360)p)/i.test(filename)) {
+    originalMatchEvidence.set(normalizedStream, [
+      filename, rawStream.title, rawStream.description
+    ].filter(Boolean).join(" "));
+  }
+  return normalizedStream;
 }
 
 function dedupeStreams(streams) {
