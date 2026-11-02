@@ -21,6 +21,26 @@ const SHOWS = [
     ids: ["uuZQ-JgKT2s", "yzjt0_tnNTY", "GGwU3PM7Ei0", "gw3Qya-AaS4", "Kc6JezV_1oY",
       "0cv2d_cjqwc", "UCKE8nvOkwI", "8wDHyimd1hU", "QCtFMNmES7I", "O6QUsYrGFNM"],
     dates: ["09-28", "09-29", "10-05", "10-06", "10-12", "10-13", "10-19", "10-20", "10-26", "10-27"]
+  },
+  {
+    id: "doomyt:dar-e-nijaat", name: "Dar-e-Nijaat", channel: "ARY Digital",
+    url: "https://www.youtube.com/playlist?list=PLSRofOhAwpGU",
+    ids: ["0ZYscAm2xrA", "qfz_A3fhI3Q", "lAIiyy3wExc", "DLSZCkBTNxs", "7Rmnsy_7hAs",
+      "VxbFxMgEt_Y", "3OFlaPUXXpk", "MhhOequ5apI", "PVSP_kYdGf4", "EVR3vZO2huM",
+      "aAf4XnntclM", "0H6OWcftMFk", "Ngo-ziTHKgw", "SapJNU47328", "4Bl6xA5gIxo",
+      "67Fio2zNEDE", "roLUcTdB0Ak", "IDx0kRC4vcY", "o_JLuP5pDVM", "WanDB4fRvOs",
+      "unIudLtH-Js", "TgmLGIfqssg", "ebioxADOBOw", "tMwTz2a72cw", "X6qfF2t9fmQ",
+      "dIssXLq1KLQ", "8pt_ru3Y-K8"],
+    dates: ["08-01", "08-07", "08-08", "08-14", "08-15", "08-21", "08-22", "08-28", "08-29",
+      "09-04", "09-05", "09-11", "09-12", "09-18", "09-19", "09-25", "09-26",
+      "10-02", "10-03", "10-09", "10-10", "10-16", "10-17", "10-23", "10-24", "10-30", "10-31"]
+  },
+  {
+    id: "doomyt:hurmat", name: "Hurmat", channel: "HUM TV",
+    url: "https://www.youtube.com/show/VLPLUhXU7qvJUJ0?sbp=QAE%253D",
+    ids: ["YXWuZKn452A", "Rb55pU43mw0", "uY8hogzkLB8", "IBQ3xgoCUqs", "U0W2RJOkvkw",
+      "DTyP7i3CYq4", "w6hU2MPkgik", "O5zs__9FJsM"],
+    dates: ["10-05", "10-06", "10-12", "10-13", "10-19", "10-20", "10-26", "10-27"]
   }
 ];
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -59,11 +79,12 @@ function extractInitialData(html) {
 
 function listedEpisodes(payload, show = SHOWS[0]) {
   const episodes = new Map();
-  const escapedName = show.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
-  const episodePattern = new RegExp(`^${escapedName}\\s+(?:Episode|Ep)\\s*[.:-]?\\s*(\\d+)\\b`, "i");
+  const escapedName = show.name.split(/[\s-]+/)
+    .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[\\s-]+");
+  const episodePattern = new RegExp(`^${escapedName}\\s+(?:-\\s*)?(?:Episode|Ep)\\s*[.:-]?\\s*(\\d+)\\b`, "i");
   let continuation = "";
   visit(payload, (node) => {
-    const renderer = node.playlistVideoRenderer || node.videoRenderer;
+    const renderer = node.playlistVideoRenderer || node.videoRenderer || lockupVideo(node.lockupViewModel);
     if (renderer) {
       const title = text(renderer.title);
       const match = title.match(episodePattern);
@@ -88,6 +109,20 @@ function listedEpisodes(payload, show = SHOWS[0]) {
     if (endpoint?.continuationCommand?.token) continuation = endpoint.continuationCommand.token;
   });
   return { episodes: [...episodes.values()], continuation };
+}
+
+function lockupVideo(lockup) {
+  if (lockup?.contentType !== "LOCKUP_CONTENT_TYPE_VIDEO") return null;
+  let duration = "";
+  visit(lockup.contentImage, (node) => {
+    const badge = node.thumbnailBadgeViewModel?.text;
+    if (/^\d+(?::\d{2}){1,2}$/.test(badge || "")) duration = badge;
+  });
+  return {
+    videoId: lockup.contentId,
+    title: { simpleText: lockup.metadata?.lockupMetadataViewModel?.title?.content || "" },
+    lengthText: { simpleText: duration }
+  };
 }
 
 function createShowSource(show, { fetchImpl = global.fetch, refreshMs = REFRESH_MS } = {}) {

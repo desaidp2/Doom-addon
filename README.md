@@ -30,7 +30,8 @@ every enabled provider, merges the results, and returns Stremio stream objects.
 ## YouTube Drama Test
 
 Install `/addons/dramas/manifest.json` separately for Mitti De Baway's official
-Green TV episodes and Mohabbat's official HAR PAL GEO episodes on YouTube.
+Green TV episodes, Mohabbat (HAR PAL GEO), Dar-e-Nijaat (ARY Digital), and Hurmat
+(HUM TV) on YouTube.
 This catalog is independent of the existing providers
 and quality tabs. Its source is `youtube-dramas.js`; the episode listing refreshes
 in the running server every 30 minutes, keeping the previous list on fetch failure.

@@ -59,7 +59,7 @@ async function main() {
   assert.equal(source.getMeta("series", SHOW_ID).meta.videos.length, 3);
 
   let geoFails = false;
-  const both = createDramaSource({ fetchImpl: async (url) => {
+  const both = createDramaSource({ shows: SHOWS.slice(0, 2), fetchImpl: async (url) => {
     if (url === SHOWS[1].url) {
       if (geoFails) throw new Error("test GEO outage");
       return new Response(html({ entries: [renderer(1, {
@@ -81,6 +81,45 @@ async function main() {
   geoFails = true;
   assert.equal(await both.refresh(), false);
   assert.equal(both.getMeta("series", SHOWS[1].id).meta.videos.length, 2);
+
+  const modern = { lockupViewModel: {
+    contentType: "LOCKUP_CONTENT_TYPE_VIDEO", contentId: "0ZYscAm2xrA",
+    metadata: { lockupMetadataViewModel: { title: { content: "Dar-e-Nijaat EP 1 | 1 AUG 2026 | ARY Digital" } } },
+    contentImage: { thumbnailViewModel: { overlays: [{ thumbnailBottomOverlayViewModel: {
+      badges: [{ thumbnailBadgeViewModel: { text: "37:54" } }]
+    } }] } }
+  } };
+  const modernEpisodes = listedEpisodes({ entries: [modern, modern] }, SHOWS[2]).episodes;
+  assert.equal(modernEpisodes.length, 1);
+  assert.equal(modernEpisodes[0].videoId, "0ZYscAm2xrA");
+  assert.equal(modernEpisodes[0].released, "2026-08-01T00:00:00.000Z");
+  assert.equal(listedEpisodes(modern, SHOWS[3]).episodes.length, 0);
+  const shortClip = structuredClone(modern);
+  shortClip.lockupViewModel.contentImage.thumbnailViewModel.overlays[0]
+    .thumbnailBottomOverlayViewModel.badges[0].thumbnailBadgeViewModel.text = "01:30";
+  assert.equal(listedEpisodes(shortClip, SHOWS[2]).episodes.length, 0);
+  const hurmat = renderer(1, { videoId: "YXWuZKn452A",
+    title: { simpleText: "Hurmat - Episode 01 [Eng Sub] - 5th Oct 2026 - HUM TV" } });
+  assert.equal(listedEpisodes(hurmat, SHOWS[3]).episodes[0].episode, 1);
+
+  const all = createDramaSource({ fetchImpl: async (url) => {
+    const show = SHOWS.find((item) => item.url === url);
+    assert.ok(show);
+    return new Response(html({ entries: [renderer(1, { videoId: show.ids[0],
+      title: { simpleText: `${show.name} - Episode 1 | 1 October 2026` } })] }));
+  } });
+  for (const [index, count] of [12, 10, 27, 8].entries()) {
+    assert.equal(all.getMeta("series", SHOWS[index].id).meta.videos.length, count);
+  }
+  assert.equal(all.getCatalog("series", "youtube-dramas").metas.length, 4);
+  assert.equal(await all.refresh(), true);
+  for (const show of SHOWS) {
+    const result = all.getStreams("series", `${show.id}:1:1`);
+    assert.equal(result[0].ytId, show.ids[0]);
+    assert.equal(result[0].url, undefined);
+    assert.equal(result[0].name, `YouTube - ${show.channel}`);
+    assert.equal(all.getMeta("series", show.id).meta.videos.length, 1);
+  }
   console.log("YouTube drama metadata, pagination, refresh, and ytId streams passed");
 }
 main().catch((error) => { console.error(error); process.exitCode = 1; });
