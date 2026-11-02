@@ -13,11 +13,21 @@ const INITIAL_DATES = [
   "09-23", "09-24", "09-30", "10-01", "10-07", "10-08",
   "10-14", "10-15", "10-21", "10-22", "10-28", "10-29"
 ];
+const SHOWS = [
+  { id: SHOW_ID, name: SHOW_NAME, url: SHOW_URL, channel: "Green TV", ids: INITIAL_IDS, dates: INITIAL_DATES },
+  {
+    id: "doomyt:mohabbat", name: "Mohabbat", channel: "HAR PAL GEO",
+    url: "https://www.youtube.com/show/VLPLQoBq1R3C8rI?sbp=Kgt1dVpRLUpnS1Qyc0AB",
+    ids: ["uuZQ-JgKT2s", "yzjt0_tnNTY", "GGwU3PM7Ei0", "gw3Qya-AaS4", "Kc6JezV_1oY",
+      "0cv2d_cjqwc", "UCKE8nvOkwI", "8wDHyimd1hU", "QCtFMNmES7I", "O6QUsYrGFNM"],
+    dates: ["09-28", "09-29", "10-05", "10-06", "10-12", "10-13", "10-19", "10-20", "10-26", "10-27"]
+  }
+];
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
-function episodeMeta(videoId, episode, title, released) {
+function episodeMeta(videoId, episode, title, released, showId = SHOW_ID) {
   return {
-    id: `${SHOW_ID}:1:${episode}`,
+    id: `${showId}:1:${episode}`,
     season: 1,
     episode,
     title,
@@ -47,14 +57,16 @@ function extractInitialData(html) {
   throw new Error("YouTube episode listing is unavailable");
 }
 
-function listedEpisodes(payload) {
+function listedEpisodes(payload, show = SHOWS[0]) {
   const episodes = new Map();
+  const escapedName = show.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+  const episodePattern = new RegExp(`^${escapedName}\\s+(?:Episode|Ep)\\s*[.:-]?\\s*(\\d+)\\b`, "i");
   let continuation = "";
   visit(payload, (node) => {
     const renderer = node.playlistVideoRenderer || node.videoRenderer;
     if (renderer) {
       const title = text(renderer.title);
-      const match = title.match(/^Mitti\s+De\s+Baway\s+(?:Episode|Ep)\s*[.:-]?\s*(\d+)\b/i);
+      const match = title.match(episodePattern);
       const seconds = Number(renderer.lengthSeconds) || text(renderer.lengthText).split(":")
         .reduce((total, part) => total * 60 + Number(part), 0);
       const upcoming = Number(renderer.upcomingEventData?.startTime) * 1000 > Date.now();
@@ -70,7 +82,7 @@ function listedEpisodes(payload) {
         const month = String(MONTHS.indexOf(date[2].slice(0, 3).toLowerCase()) + 1).padStart(2, "0");
         released = `${year}-${month}-${date[1].padStart(2, "0")}T00:00:00.000Z`;
       }
-      if (!episodes.has(episode)) episodes.set(episode, episodeMeta(renderer.videoId, episode, title, released));
+      if (!episodes.has(episode)) episodes.set(episode, episodeMeta(renderer.videoId, episode, title, released, show.id));
     }
     const endpoint = node.continuationItemRenderer?.continuationEndpoint;
     if (endpoint?.continuationCommand?.token) continuation = endpoint.continuationCommand.token;
@@ -78,10 +90,10 @@ function listedEpisodes(payload) {
   return { episodes: [...episodes.values()], continuation };
 }
 
-function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } = {}) {
-  let episodes = INITIAL_IDS.map((id, index) => episodeMeta(
-    id, index + 1, `${SHOW_NAME} - Episode ${index + 1}`,
-    `2026-${INITIAL_DATES[index]}T00:00:00.000Z`
+function createShowSource(show, { fetchImpl = global.fetch, refreshMs = REFRESH_MS } = {}) {
+  let episodes = show.ids.map((id, index) => episodeMeta(
+    id, index + 1, `${show.name} - Episode ${index + 1}`,
+    `2026-${show.dates[index]}T00:00:00.000Z`, show.id
   ));
   let lastAttempt = 0;
   let pending = null;
@@ -91,10 +103,10 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
     lastAttempt = Date.now();
     pending = (async () => {
       const signal = AbortSignal.timeout(20000);
-      const response = await fetchImpl(SHOW_URL, { signal, headers: { "Accept-Language": "en-US,en;q=0.9" } });
+      const response = await fetchImpl(show.url, { signal, headers: { "Accept-Language": "en-US,en;q=0.9" } });
       if (!response.ok) throw new Error(`YouTube listing returned HTTP ${response.status}`);
       const html = await response.text();
-      let page = listedEpisodes(extractInitialData(html));
+      let page = listedEpisodes(extractInitialData(html), show);
       const found = new Map(page.episodes.map((episode) => [episode.episode, episode]));
       const seen = new Set();
       const clientVersion = html.match(/"INNERTUBE_CLIENT_VERSION"\s*:\s*"([^"]+)"/)?.[1];
@@ -112,7 +124,7 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
           })
         });
         if (!next.ok) throw new Error(`YouTube continuation returned HTTP ${next.status}`);
-        page = listedEpisodes(await next.json());
+        page = listedEpisodes(await next.json(), show);
         for (const episode of page.episodes) {
           if (!found.has(episode.episode)) found.set(episode.episode, episode);
         }
@@ -121,7 +133,7 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
       episodes = [...found.values()].sort((a, b) => a.episode - b.episode);
       return true;
     })().catch((error) => {
-      console.error(`[Dramas] ${error.message}`);
+      console.error(`[Dramas: ${show.name}] ${error.message}`);
       return false;
     }).finally(() => { pending = null; });
     return pending;
@@ -131,12 +143,12 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
     if (!lastAttempt || Date.now() - lastAttempt >= refreshMs) void refresh();
   }
 
-  const poster = `https://i.ytimg.com/vi/${INITIAL_IDS[0]}/hqdefault.jpg`;
+  const poster = `https://i.ytimg.com/vi/${show.ids[0]}/hqdefault.jpg`;
   function showMeta() {
     return {
-      id: SHOW_ID, type: "series", name: SHOW_NAME,
+      id: show.id, type: "series", name: show.name,
       poster, posterShape: "landscape", background: poster,
-      description: "Mitti De Baway - official full episodes from Green TV Entertainment on YouTube.",
+      description: `${show.name} - official full episodes from ${show.channel} on YouTube.`,
       genres: ["Drama"], releaseInfo: "2026-", language: "Urdu", country: "Pakistan",
       behaviorHints: { defaultVideoId: null }
     };
@@ -149,10 +161,10 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
       ensureRefresh();
       const params = new URLSearchParams(extra);
       const search = (params.get("search") || "").toLowerCase();
-      return { metas: Number(params.get("skip") || 0) > 0 || !SHOW_NAME.toLowerCase().includes(search) ? [] : [showMeta()] };
+      return { metas: Number(params.get("skip") || 0) > 0 || !show.name.toLowerCase().includes(search) ? [] : [showMeta()] };
     },
     getMeta(type, id) {
-      if (type !== "series" || id !== SHOW_ID) return null;
+      if (type !== "series" || id !== show.id) return null;
       ensureRefresh();
       return { meta: { ...showMeta(), videos: episodes.map(({ videoId, ...video }) => video) } };
     },
@@ -161,8 +173,8 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
       ensureRefresh();
       const episode = episodes.find((video) => video.id === id);
       return episode ? [{
-        name: "YouTube - Green TV", title: episode.title, ytId: episode.videoId,
-        behaviorHints: { bingeGroup: SHOW_ID }
+        name: `YouTube - ${show.channel}`, title: episode.title, ytId: episode.videoId,
+        behaviorHints: { bingeGroup: show.id }
       }] : [];
     },
     start() {
@@ -174,4 +186,25 @@ function createDramaSource({ fetchImpl = global.fetch, refreshMs = REFRESH_MS } 
   };
 }
 
-module.exports = { createDramaSource, extractInitialData, listedEpisodes, SHOW_ID };
+function createDramaSource({ shows = SHOWS, ...options } = {}) {
+  const sources = shows.map((show) => ({ show, source: createShowSource(show, options) }));
+  return {
+    refresh: async () => (await Promise.all(sources.map(({ source }) => source.refresh()))).every(Boolean),
+    getCatalog(type, id, extra = "") {
+      if (type !== "series" || id !== "youtube-dramas") return null;
+      return { metas: sources.flatMap(({ source }) => source.getCatalog(type, id, extra).metas) };
+    },
+    getMeta(type, id) {
+      return sources.find(({ show }) => show.id === id)?.source.getMeta(type, id) || null;
+    },
+    getStreams(type, id) {
+      return sources.find(({ show }) => id.startsWith(`${show.id}:`))?.source.getStreams(type, id) || [];
+    },
+    start() {
+      const stops = sources.map(({ source }) => source.start());
+      return () => stops.forEach((stop) => stop());
+    }
+  };
+}
+
+module.exports = { createDramaSource, extractInitialData, listedEpisodes, SHOW_ID, SHOWS };
