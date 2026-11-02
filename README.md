@@ -27,6 +27,16 @@ upstream sources directly:
 It exposes a Stremio-compatible `manifest.json` and a stream endpoint that calls
 every enabled provider, merges the results, and returns Stremio stream objects.
 
+## YouTube Drama Test
+
+Install `/addons/dramas/manifest.json` separately for Mitti De Baway's official
+Green TV YouTube episodes. This catalog is independent of the existing providers
+and quality tabs. Its source is `youtube-dramas.js`; the episode listing refreshes
+in the running server every 30 minutes, keeping the previous list on fetch failure.
+It returns `ytId` streams, not expiring extracted video URLs or a video proxy.
+Playback depends on the installed Nuvio build's YouTube support. Ad-free playback
+is not guaranteed by this addon.
+
 ## Files
 
 - `manifest.json` - Stremio add-on manifest

@@ -4,7 +4,7 @@ const http = require("http");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const { manifest, addonManifests, getCatalog, getMeta, getStreams, scopeHasProvider, parseStremioId } = require("./addon");
+const { manifest, addonManifests, getCatalog, getMeta, getStreams, scopeHasProvider, parseStremioId, startDramaRefresh } = require("./addon");
 const aioStreamsProvider = require("./providers/aiostreams");
 
 const PORT = Number(process.env.PORT || 7000);
@@ -321,6 +321,7 @@ const server = http.createServer(async (request, response) => {
           `FHD: ${url.origin}/addons/quality-1080/manifest.json`,
           `HD: ${url.origin}/addons/quality-low/manifest.json`,
           `Live: ${url.origin}/addons/live/manifest.json`,
+          `Dramas: ${url.origin}/addons/dramas/manifest.json`,
           ""
         ].join("\n")
       );
@@ -399,6 +400,7 @@ const server = http.createServer(async (request, response) => {
 });
 
 server.listen(PORT, HOST, () => {
+  startDramaRefresh();
   const displayHost = HOST === "0.0.0.0" ? "localhost" : HOST;
   console.log(`Doom-addon Stremio add-on listening on http://${displayHost}:${PORT}`);
 });

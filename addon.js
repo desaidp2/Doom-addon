@@ -2,6 +2,8 @@
 
 const fs = require("fs");
 const path = require("path");
+const { createDramaSource } = require("./youtube-dramas");
+const youtubeDramas = createDramaSource();
 
 const ROOT = __dirname;
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "439c478a771f35c05022f9feabcca01c";
@@ -270,6 +272,17 @@ const liveManifest = Object.assign({}, manifest, {
   })
 });
 addonManifests.live = liveManifest;
+addonManifests.dramas = {
+  id: `${manifest.id}.dramas`, version: manifest.version, name: "Dramas",
+  description: "Official YouTube drama episodes, played directly by Nuvio.",
+  logo: manifest.logo,
+  resources: ["catalog", "meta", "stream"], types: ["series"], idPrefixes: ["doomyt:"],
+  catalogs: [{
+    type: "series", id: "youtube-dramas", name: "YouTube Dramas",
+    extra: [{ name: "search", isRequired: false }]
+  }],
+  behaviorHints: { configurable: false, p2p: false }
+};
 const streamCache = new Map();
 const streamInflight = new Map();
 const liveStreamCache = new Map();
@@ -633,10 +646,12 @@ async function getLiveStreams(type, id) {
 }
 
 function getCatalog(scope, type, id, extra = "") {
+  if (scope === "dramas") return youtubeDramas.getCatalog(type, id, extra);
   return scope === "live" ? getLiveCatalog(type, id, extra) : null;
 }
 
 function getMeta(scope, type, id) {
+  if (scope === "dramas") return youtubeDramas.getMeta(type, id);
   return scope === "live" ? getLiveMeta(type, id) : null;
 }
 
@@ -2706,6 +2721,7 @@ async function getQualityBandStreams(type, id, entries, qualityBand, requestCont
 
 async function getStreams(type, id, options = {}) {
   const scope = options.scope || "main";
+  if (scope === "dramas") return youtubeDramas.getStreams(type, id);
   if (scope === "live") {
     return getLiveStreams(type, id);
   }
@@ -2807,6 +2823,7 @@ async function getStreams(type, id, options = {}) {
 }
 
 module.exports = {
+  startDramaRefresh: () => youtubeDramas.start(),
   manifest,
   addonManifests,
   addonGroups,
