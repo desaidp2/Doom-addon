@@ -112,6 +112,20 @@ async function main() {
     assert.equal(all.getMeta("series", SHOWS[index].id).meta.videos.length, count);
   }
   assert.equal(all.getCatalog("series", "youtube-dramas").metas.length, 4);
+  for (const [query, expected] of [
+    ["Dar e Nijaat", ["Dar-e-Nijaat"]],
+    ["DARENIJAAT", ["Dar-e-Nijaat"]],
+    ["Dar\u2011e\u2011Nijaat", ["Dar-e-Nijaat"]],
+    ["  Mitti  De Baway  ", ["Mitti De Baway"]],
+    ["mohabbat", ["Mohabbat"]],
+    ["Hurmat", ["Hurmat"]],
+    ["unrelated", []],
+    ["---", []]
+  ]) {
+    const extra = new URLSearchParams({ search: query }).toString();
+    assert.deepEqual(all.getCatalog("series", "youtube-dramas", extra).metas.map((show) => show.name), expected);
+  }
+  assert.deepEqual(all.getCatalog("series", "youtube-dramas", "search=hurmat&skip=1").metas, []);
   assert.equal(await all.refresh(), true);
   for (const show of SHOWS) {
     const result = all.getStreams("series", `${show.id}:1:1`);

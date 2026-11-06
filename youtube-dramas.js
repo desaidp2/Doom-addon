@@ -61,6 +61,10 @@ function text(value) {
   return value?.simpleText || (value?.runs || []).map((run) => run.text || "").join("");
 }
 
+function searchKey(value) {
+  return value.normalize("NFKD").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+}
+
 function visit(value, callback) {
   if (!value || typeof value !== "object") return;
   callback(value);
@@ -179,6 +183,7 @@ function createShowSource(show, { fetchImpl = global.fetch, refreshMs = REFRESH_
   }
 
   const poster = `https://i.ytimg.com/vi/${show.ids[0]}/hqdefault.jpg`;
+  const titleKey = searchKey(show.name);
   function showMeta() {
     return {
       id: show.id, type: "series", name: show.name,
@@ -195,8 +200,10 @@ function createShowSource(show, { fetchImpl = global.fetch, refreshMs = REFRESH_
       if (type !== "series" || id !== "youtube-dramas") return null;
       ensureRefresh();
       const params = new URLSearchParams(extra);
-      const search = (params.get("search") || "").toLowerCase();
-      return { metas: Number(params.get("skip") || 0) > 0 || !show.name.toLowerCase().includes(search) ? [] : [showMeta()] };
+      const query = (params.get("search") || "").trim();
+      const search = searchKey(query);
+      const matches = !query || (search.length > 0 && titleKey.includes(search));
+      return { metas: Number(params.get("skip") || 0) > 0 || !matches ? [] : [showMeta()] };
     },
     getMeta(type, id) {
       if (type !== "series" || id !== show.id) return null;
