@@ -14,9 +14,11 @@ const INITIAL_DATES = [
   "10-14", "10-15", "10-21", "10-22", "10-28", "10-29"
 ];
 const SHOWS = [
-  { id: SHOW_ID, name: SHOW_NAME, url: SHOW_URL, channel: "Green TV", ids: INITIAL_IDS, dates: INITIAL_DATES },
+  { id: SHOW_ID, name: SHOW_NAME, url: SHOW_URL, channel: "Green TV", ids: INITIAL_IDS, dates: INITIAL_DATES,
+    aliases: ["tt40068581", "tmdb:336288"] },
   {
     id: "doomyt:mohabbat", name: "Mohabbat", channel: "HAR PAL GEO",
+    aliases: ["tt46669848", "tmdb:336715", "tmdb:337725"],
     url: "https://www.youtube.com/show/VLPLQoBq1R3C8rI?sbp=Kgt1dVpRLUpnS1Qyc0AB",
     ids: ["uuZQ-JgKT2s", "yzjt0_tnNTY", "GGwU3PM7Ei0", "gw3Qya-AaS4", "Kc6JezV_1oY",
       "0cv2d_cjqwc", "UCKE8nvOkwI", "8wDHyimd1hU", "QCtFMNmES7I", "O6QUsYrGFNM"],
@@ -24,6 +26,7 @@ const SHOWS = [
   },
   {
     id: "doomyt:dar-e-nijaat", name: "Dar-e-Nijaat", channel: "ARY Digital",
+    aliases: ["tt43732092", "tmdb:328722"],
     url: "https://www.youtube.com/playlist?list=PLSRofOhAwpGU",
     ids: ["0ZYscAm2xrA", "qfz_A3fhI3Q", "lAIiyy3wExc", "DLSZCkBTNxs", "7Rmnsy_7hAs",
       "VxbFxMgEt_Y", "3OFlaPUXXpk", "MhhOequ5apI", "PVSP_kYdGf4", "EVR3vZO2huM",
@@ -37,12 +40,14 @@ const SHOWS = [
   },
   {
     id: "doomyt:hurmat", name: "Hurmat", channel: "HUM TV",
+    aliases: ["tt48919149", "tmdb:337670"],
     url: "https://www.youtube.com/show/VLPLUhXU7qvJUJ0?sbp=QAE%253D",
     ids: ["YXWuZKn452A", "Rb55pU43mw0", "uY8hogzkLB8", "IBQ3xgoCUqs", "U0W2RJOkvkw",
       "DTyP7i3CYq4", "w6hU2MPkgik", "O5zs__9FJsM"],
     dates: ["10-05", "10-06", "10-12", "10-13", "10-19", "10-20", "10-26", "10-27"]
   }
 ];
+const DRAMA_STREAM_ID_PREFIXES = ["doomyt:", ...SHOWS.flatMap((show) => show.aliases.map((id) => `${id}:`))];
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 function episodeMeta(videoId, episode, title, released, showId = SHOW_ID) {
@@ -230,6 +235,9 @@ function createShowSource(show, { fetchImpl = global.fetch, refreshMs = REFRESH_
 
 function createDramaSource({ shows = SHOWS, ...options } = {}) {
   const sources = shows.map((show) => ({ show, source: createShowSource(show, options) }));
+  const sourcesById = new Map(sources.flatMap((entry) =>
+    [entry.show.id, ...(entry.show.aliases || [])].map((id) => [id, entry])
+  ));
   return {
     refresh: async () => (await Promise.all(sources.map(({ source }) => source.refresh()))).every(Boolean),
     getCatalog(type, id, extra = "") {
@@ -240,7 +248,13 @@ function createDramaSource({ shows = SHOWS, ...options } = {}) {
       return sources.find(({ show }) => show.id === id)?.source.getMeta(type, id) || null;
     },
     getStreams(type, id) {
-      return sources.find(({ show }) => id.startsWith(`${show.id}:`))?.source.getStreams(type, id) || [];
+      if (type !== "series") return [];
+      const match = /^(.+):1:(\d+)$/.exec(id);
+      if (!match) return [];
+      const entry = sourcesById.get(match[1]);
+      const episode = Number(match[2]);
+      if (!entry || !Number.isSafeInteger(episode) || episode < 1) return [];
+      return entry.source.getStreams(type, `${entry.show.id}:1:${episode}`);
     },
     start() {
       const stops = sources.map(({ source }) => source.start());
@@ -249,4 +263,4 @@ function createDramaSource({ shows = SHOWS, ...options } = {}) {
   };
 }
 
-module.exports = { createDramaSource, extractInitialData, listedEpisodes, SHOW_ID, SHOWS };
+module.exports = { createDramaSource, extractInitialData, listedEpisodes, SHOW_ID, SHOWS, DRAMA_STREAM_ID_PREFIXES };

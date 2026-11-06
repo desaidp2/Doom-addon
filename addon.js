@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { createDramaSource } = require("./youtube-dramas");
+const { createDramaSource, DRAMA_STREAM_ID_PREFIXES } = require("./youtube-dramas");
 const youtubeDramas = createDramaSource();
 
 const ROOT = __dirname;
@@ -276,7 +276,8 @@ addonManifests.dramas = {
   id: `${manifest.id}.dramas`, version: manifest.version, name: "Dramas",
   description: "Official YouTube drama episodes, played directly by Nuvio.",
   logo: manifest.logo,
-  resources: ["catalog", "meta", "stream"], types: ["series"], idPrefixes: ["doomyt:"],
+  resources: ["catalog", "meta", { name: "stream", types: ["series"], idPrefixes: DRAMA_STREAM_ID_PREFIXES }],
+  types: ["series"], idPrefixes: ["doomyt:"],
   catalogs: [{
     type: "series", id: "youtube-dramas", name: "YouTube Dramas",
     extra: [{ name: "search", isRequired: false }]

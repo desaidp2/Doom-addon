@@ -36,6 +36,10 @@ This catalog is independent of the existing providers
 and quality tabs. Its source is `youtube-dramas.js`; the episode listing refreshes
 in the running server every 30 minutes, keeping the previous list on fetch failure.
 It returns `ytId` streams, not expiring extracted video URLs or a video proxy.
+The Dramas stream resource also recognizes the four shows' verified IMDb and
+TMDB season-one episode IDs. This allows a matching episode opened from another
+metadata addon to get its YouTube source from Dramas without routing it through
+UHD, FHD, or HD.
 Playback depends on the installed Nuvio build's YouTube support. Ad-free playback
 is not guaranteed by this addon.
 

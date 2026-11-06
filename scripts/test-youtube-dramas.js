@@ -112,6 +112,28 @@ async function main() {
     assert.equal(all.getMeta("series", SHOWS[index].id).meta.videos.length, count);
   }
   assert.equal(all.getCatalog("series", "youtube-dramas").metas.length, 4);
+  for (const [id, videoId] of [
+    ["tt40068581:1:2", "sEms255DVP8"],
+    ["tmdb:336288:1:2", "sEms255DVP8"],
+    ["tt46669848:1:2", "yzjt0_tnNTY"],
+    ["tmdb:336715:1:2", "yzjt0_tnNTY"],
+    ["tmdb:337725:1:1", "uuZQ-JgKT2s"],
+    ["tt43732092:1:2", "qfz_A3fhI3Q"],
+    ["tmdb:328722:1:2", "qfz_A3fhI3Q"],
+    ["tt48919149:1:2", "Rb55pU43mw0"],
+    ["tmdb:337670:1:2", "Rb55pU43mw0"]
+  ]) {
+    const streams = all.getStreams("series", id);
+    assert.equal(streams.length, 1);
+    assert.equal(streams[0].ytId, videoId);
+    assert.equal(streams[0].url, undefined);
+  }
+  for (const id of ["tt46669848", "tt46669848:2:1", "tt46669848:1:0", "tt46669848:1:999",
+    "tt466698480:1:2", "tmdb:336715:1:2:extra", "tmdb:99999999:1:1"]) {
+    assert.deepEqual(all.getStreams("series", id), []);
+  }
+  assert.deepEqual(all.getStreams("movie", "tt46669848:1:2"), []);
+  assert.equal(all.getMeta("series", "tt46669848"), null);
   for (const [query, expected] of [
     ["Dar e Nijaat", ["Dar-e-Nijaat"]],
     ["DARENIJAAT", ["Dar-e-Nijaat"]],
@@ -134,6 +156,6 @@ async function main() {
     assert.equal(result[0].name, `YouTube - ${show.channel}`);
     assert.equal(all.getMeta("series", show.id).meta.videos.length, 1);
   }
-  console.log("YouTube drama metadata, pagination, refresh, and ytId streams passed");
+  console.log("YouTube drama metadata, search, refresh, and external episode ID tests passed");
 }
 main().catch((error) => { console.error(error); process.exitCode = 1; });
