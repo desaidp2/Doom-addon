@@ -1,12 +1,12 @@
 {
   "name": "Doom-addon",
-  "version": "3.0.19",
+  "version": "3.0.20",
   "scrapers": [
     {
       "id": "4khdhub",
       "name": "4KHDHub",
       "description": "4KHDHub direct links",
-      "version": "1.0.15",
+      "version": "1.0.16",
       "author": "ummarm",
       "supportedTypes": [
         "movie",
@@ -48,7 +48,7 @@
       "id": "4khdhub_yoruix",
       "name": "4KHDHub Yoruix",
       "description": "Alternate 4KHDHub implementation synced from yoruix/nuvio-providers",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "author": "ummarm",
       "supportedTypes": [
         "movie",
@@ -846,7 +846,7 @@
       "id": "4khdhubnew",
       "name": "4KHDHub-NEW",
       "description": "4KHDHub-NEW streams synced from D3adlyRocket/All-in-One-Nuvio",
-      "version": "2.0.3",
+      "version": "2.0.4",
       "author": "ummarm",
       "supportedTypes": [
         "movie",
@@ -1006,7 +1006,7 @@
       "id": "vegamovies",
       "name": "VegaMovies",
       "description": "VegaMovies streams synced from D3adlyRocket/All-in-One-Nuvio, filtered to Hindi/English 720p through 4K playable and seekable links",
-      "version": "2.0.10",
+      "version": "2.0.11",
       "author": "ummarm",
       "supportedTypes": [
         "movie",
