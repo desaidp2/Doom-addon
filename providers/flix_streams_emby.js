@@ -1,7 +1,7 @@
 "use strict";
 
 const PROVIDER_NAME = "Flix-Streams Emby";
-const DEFAULT_MANIFEST_URL = "https://flixnest.app/flix-streams/u/6p9xzp78nunz/manifest.json";
+const DEFAULT_MANIFEST_URL = "";
 const RETRY_STATUSES = new Set([429, 500, 502, 503, 504]);
 const RETRY_DELAYS_MS = [500, 1500];
 
