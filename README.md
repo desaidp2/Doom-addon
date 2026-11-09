@@ -198,7 +198,7 @@ The stream endpoint shape is:
 - Provider files sync directly from the original upstream sources:
   `https://raw.githubusercontent.com/D3adlyRocket/All-in-One-Nuvio/refs/heads/main/manifest.json`,
   `https://raw.githubusercontent.com/yoruix/nuvio-providers/refs/heads/main/manifest.json`,
-  `https://flixnest.app/flix-streams/u/6p9xzp78nunz/manifest.json`, and
+  `<your-flix-streams-manifest-url>`, and
   `https://badboysxs-morpheus.hf.space/manifest.json`.
 - If you keep redistributing these files, keep the original license terms and
   attribution in mind.
