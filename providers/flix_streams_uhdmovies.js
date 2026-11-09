@@ -1,7 +1,7 @@
 "use strict";
 
 const PROVIDER_NAME = "Flix-Streams UHDMovies";
-const DEFAULT_MANIFEST_URL = "https://flixnest.app/flix-streams/u/6p9xzp78nunz/manifest.json";
+const DEFAULT_MANIFEST_URL = "";
 
 function configuredBaseUrl() {
   const raw = process.env.FLIX_STREAMS_MANIFEST_URL || process.env.FLIX_STREAMS_BASE_URL || DEFAULT_MANIFEST_URL;
