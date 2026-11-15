@@ -134,13 +134,14 @@ const PROVIDER_MODE = process.env.DOOM_PROVIDER_MODE || (process.env.DOOM_EXCLUD
 const addonIdentity = {
   lite: { id: "community.doomplug.lite", name: "Doom Lite" },
   flix: { id: "community.doomplug.flixstreams", name: "Doom FlixStreams" },
-  torbox: { id: "community.doomplug.torboxonly", name: "Doom Torbox" }
+  torbox: { id: "community.doomplug.torboxonly", name: "Doom Torbox" },
+  reborn: { id: "community.doomplug.reborn", name: "Doom Reborn" }
 }[PROVIDER_MODE];
 if (addonIdentity) {
   manifest.id = addonIdentity.id;
   manifest.name = addonIdentity.name;
   const activeProviders = providerRegistry.scrapers.filter((provider) => provider.enabled && (
-    PROVIDER_MODE === "lite" ? !provider.id.startsWith("flix_streams_") && provider.id !== "torbox"
+    PROVIDER_MODE === "lite" || PROVIDER_MODE === "reborn" ? !provider.id.startsWith("flix_streams_") && provider.id !== "torbox"
     : PROVIDER_MODE === "flix" ? provider.id.startsWith("flix_streams_")
     : provider.id === "torbox"
   ));
@@ -149,7 +150,7 @@ if (addonIdentity) {
 const providerEntries = providerRegistry.scrapers
   .filter((provider) => provider.enabled)
   .filter((provider) => {
-    if (PROVIDER_MODE === "lite") return !provider.id.startsWith("flix_streams_") && provider.id !== "torbox";
+    if (PROVIDER_MODE === "lite" || PROVIDER_MODE === "reborn") return !provider.id.startsWith("flix_streams_") && provider.id !== "torbox";
     if (PROVIDER_MODE === "flix") return provider.id.startsWith("flix_streams_");
     if (PROVIDER_MODE === "torbox") return provider.id === "torbox";
     return true;
@@ -251,14 +252,17 @@ const addonGroups = {
     qualityBand: "low"
   }
 };
+const visibleAddonGroups = PROVIDER_MODE === "reborn"
+  ? Object.fromEntries(Object.entries(addonGroups).filter(([slug]) => slug !== "flixnest" && slug !== "torbox"))
+  : addonGroups;
 const addonGroupEntries = Object.fromEntries(
-  Object.entries(addonGroups).map(([slug, group]) => [
+  Object.entries(visibleAddonGroups).map(([slug, group]) => [
     slug,
     providerEntries.filter((provider) => group.providerIds.includes(provider.id))
   ])
 );
 const addonManifests = Object.fromEntries(
-  Object.entries(addonGroups).map(([slug, group]) => [
+  Object.entries(visibleAddonGroups).map(([slug, group]) => [
     slug,
     Object.assign({}, manifest, {
       id: `${manifest.id}.${slug}`,
