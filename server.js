@@ -380,14 +380,16 @@ const server = http.createServer(async (request, response) => {
         sendJson(response, 404, { error: "Add-on group not found" });
         return;
       }
-      const disableStreamCache = streamRequest.scope === "live"
+      const disableStreamCache = process.env.DOOM_PROVIDER_MODE === "reborn"
+        || streamRequest.scope === "live"
         || scopeHasProvider(streamRequest.scope, "aiostreams")
         || scopeHasProvider(streamRequest.scope, "torbox");
       const cacheSeconds = disableStreamCache ? 0 : 300;
       const responseStreams = scopeHasProvider(streamRequest.scope, "aiostreams")
         ? redirectAioStreams(streams, streamRequest, url.origin)
         : streams;
-      const sourceLabel = process.env.DOOM_PROVIDER_MODE === "flix" ? "Doom FlixStreams"
+      const sourceLabel = process.env.DOOM_PROVIDER_MODE === "reborn" ? "Doom Reborn"
+        : process.env.DOOM_PROVIDER_MODE === "flix" ? "Doom FlixStreams"
         : process.env.DOOM_PROVIDER_MODE === "torbox" ? "Doom Torbox"
         : process.env.DOOM_PROVIDER_MODE === "lite" || process.env.DOOM_EXCLUDE_FLIXSTREAMS_TORBOX === "1" ? "Doom Lite"
         : "";
