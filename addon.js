@@ -137,8 +137,7 @@ const FLIX_SELECTED_PROVIDER_IDS = new Set([
   "flix_streams_debridvault",
   "flix_streams_signalvault",
   "flix_streams_usenetvault",
-  "flix_streams_streamvault",
-  "flix_streams_other"
+  "flix_streams_streamvault"
 ]);
 const PROVIDER_MODE = process.env.DOOM_PROVIDER_MODE || (process.env.DOOM_EXCLUDE_FLIXSTREAMS_TORBOX === "1" ? "lite" : "all");
 const addonIdentity = {
