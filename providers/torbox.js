@@ -50,7 +50,15 @@ async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
       }
 
       const payload = await response.json();
-      return Array.isArray(payload.streams) ? payload.streams : [];
+      // AIOStreams' configured formatter marks provider-cached results with the cloud icon.
+      // Keep only explicitly marked cached results; unknown/uncached streams are excluded.
+      return Array.isArray(payload.streams)
+        ? payload.streams.filter((stream) => {
+            if (!stream || !stream.url) return false;
+            const marker = [stream.name, stream.title, stream.description].filter(Boolean).join(" ");
+            return marker.includes("☁️") || marker.includes("☁");
+          })
+        : [];
     } catch (error) {
       lastError = error;
       console.error(`[${PROVIDER_NAME}] ${baseUrl}: ${error.message || error}`);
