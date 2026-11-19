@@ -130,10 +130,21 @@ const nuvioLiveCatalogs = [
 ];
 const liveCatalogs = [...sportsFreeLiveCatalogs, ...nuvioLiveCatalogs];
 
+const FLIX_SELECTED_PROVIDER_IDS = new Set([
+  "flix_streams_emby",
+  "flix_streams_lotusvault",
+  "flix_streams_archivevault",
+  "flix_streams_debridvault",
+  "flix_streams_signalvault",
+  "flix_streams_usenetvault",
+  "flix_streams_streamvault",
+  "flix_streams_other"
+]);
 const PROVIDER_MODE = process.env.DOOM_PROVIDER_MODE || (process.env.DOOM_EXCLUDE_FLIXSTREAMS_TORBOX === "1" ? "lite" : "all");
 const addonIdentity = {
   lite: { id: "community.doomplug.lite", name: "Doom Lite" },
   flix: { id: "community.doomplug.flixstreams", name: "Doom FlixStreams" },
+  "flix-selected": { id: "community.doomplug.flixselected", name: "Doom FlixStreams Selected" },
   torbox: { id: "community.doomplug.torboxonly", name: "Doom Torbox" }
 }[PROVIDER_MODE];
 if (addonIdentity) {
@@ -142,6 +153,7 @@ if (addonIdentity) {
   const activeProviders = providerRegistry.scrapers.filter((provider) => provider.enabled && (
     PROVIDER_MODE === "lite" ? !provider.id.startsWith("flix_streams_") && provider.id !== "torbox"
     : PROVIDER_MODE === "flix" ? provider.id.startsWith("flix_streams_")
+    : PROVIDER_MODE === "flix-selected" ? FLIX_SELECTED_PROVIDER_IDS.has(provider.id)
     : provider.id === "torbox"
   ));
   manifest.description = addonIdentity.name + " — " + activeProviders.length + " enabled provider(s): " + activeProviders.map((provider) => provider.name).join(", ") + ".";
@@ -151,6 +163,7 @@ const providerEntries = providerRegistry.scrapers
   .filter((provider) => {
     if (PROVIDER_MODE === "lite") return !provider.id.startsWith("flix_streams_") && provider.id !== "torbox";
     if (PROVIDER_MODE === "flix") return provider.id.startsWith("flix_streams_");
+    if (PROVIDER_MODE === "flix-selected") return FLIX_SELECTED_PROVIDER_IDS.has(provider.id);
     if (PROVIDER_MODE === "torbox") return provider.id === "torbox";
     return true;
   })
