@@ -50,14 +50,20 @@ async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
       }
 
       const payload = await response.json();
-      // AIOStreams' configured formatter marks provider-cached results with the cloud icon.
-      // Keep only explicitly marked cached results; unknown/uncached streams are excluded.
+      // Keep every playable Torbox result. Put explicitly cached streams first,
+      // but do not discard uncached results: Torbox may need time to download them.
       return Array.isArray(payload.streams)
-        ? payload.streams.filter((stream) => {
-            if (!stream || !stream.url) return false;
-            const marker = [stream.name, stream.title, stream.description].filter(Boolean).join(" ");
-            return marker.includes("☁️") || marker.includes("☁");
-          })
+        ? payload.streams
+            .filter((stream) => stream && stream.url)
+            .sort((a, b) => {
+              const isCached = (stream) => {
+                const marker = [stream.name, stream.title, stream.description]
+                  .filter(Boolean)
+                  .join(" ");
+                return marker.includes("☁️") || marker.includes("☁");
+              };
+              return Number(isCached(b)) - Number(isCached(a));
+            })
         : [];
     } catch (error) {
       lastError = error;
