@@ -170,6 +170,25 @@ addon's TMDB lookup, then enriched with that requested title/year before the
 wrong-title filter runs. This keeps NetMirror's minimal `Auto` stream labels
 from being rejected when the source itself does not include a filename.
 
+## Selected Flix-Streams-only mode
+
+Set `DOOM_PROVIDER_MODE=flix-selected` to expose a separate Stremio add-on
+containing only these eight Flix-Streams wrappers:
+
+- Emby / Media Lib
+- LotusVault
+- ArchiveVault
+- Debrid Vault
+- Signal Vault
+- Usenet Vault
+- Stream Vault
+- Other
+
+This mode uses the same configured Flix-Streams manifest URL and stream
+resolvers as the regular wrappers. It does not change the default all-provider
+mode. The selected mode has its own manifest identity:
+`community.doomplug.flixselected`.
+
 ## Deploy
 
 This add-on is dynamic, so the raw GitHub URL is no longer enough for Stremio.
