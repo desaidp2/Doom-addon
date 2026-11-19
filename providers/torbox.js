@@ -52,18 +52,20 @@ async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
       const payload = await response.json();
       // Keep every playable Torbox result. Put explicitly cached streams first,
       // but do not discard uncached results: Torbox may need time to download them.
+      const isCached = (stream) => {
+        const marker = [stream.name, stream.title, stream.description]
+          .filter(Boolean)
+          .join(" ");
+        return marker.includes("☁️") || marker.includes("☁");
+      };
       return Array.isArray(payload.streams)
         ? payload.streams
             .filter((stream) => stream && stream.url)
-            .sort((a, b) => {
-              const isCached = (stream) => {
-                const marker = [stream.name, stream.title, stream.description]
-                  .filter(Boolean)
-                  .join(" ");
-                return marker.includes("☁️") || marker.includes("☁");
-              };
-              return Number(isCached(b)) - Number(isCached(a));
-            })
+            .sort((a, b) => Number(isCached(b)) - Number(isCached(a)))
+            .map((stream) => ({
+              ...stream,
+              name: `${isCached(stream) ? "☁️ CACHED" : "⬇️ NOT MARKED CACHED"} · ${stream.name || "Torbox"}`
+            }))
         : [];
     } catch (error) {
       lastError = error;
