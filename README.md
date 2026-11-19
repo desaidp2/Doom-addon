@@ -173,7 +173,7 @@ from being rejected when the source itself does not include a filename.
 ## Selected Flix-Streams-only mode
 
 Set `DOOM_PROVIDER_MODE=flix-selected` to expose a separate Stremio add-on
-containing only these eight Flix-Streams wrappers:
+containing only these seven Flix-Streams wrappers:
 
 - Emby / Media Lib
 - LotusVault
@@ -182,7 +182,6 @@ containing only these eight Flix-Streams wrappers:
 - Signal Vault
 - Usenet Vault
 - Stream Vault
-- Other
 
 This mode uses the same configured Flix-Streams manifest URL and stream
 resolvers as the regular wrappers. It does not change the default all-provider
