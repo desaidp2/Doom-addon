@@ -8,7 +8,7 @@ function normalizeBaseUrl(raw) {
   if (!raw) {
     return "";
   }
-  return raw.replace(/\/manifest\.json$/i, "").replace(/\/+$/, "");
+  return raw.replace(/\\/manifest\\.json$/i, "").replace(/\\/+$/, "");
 }
 
 function manifestBaseUrls() {
@@ -24,6 +24,28 @@ function streamId(baseId, mediaType, season, episode) {
     return `${baseId}:${season}:${episode}`;
   }
   return baseId;
+}
+
+function hasPlayableSource(stream) {
+  return Boolean(stream && (stream.url || stream.infoHash || (Array.isArray(stream.sources) && stream.sources.length)));
+}
+
+function cacheState(stream) {
+  // Prefer structured cache metadata when the upstream provides it.
+  if (stream && stream.service && typeof stream.service.cached === "boolean") {
+    return stream.service.cached;
+  }
+  if (stream && typeof stream.cached === "boolean") {
+    return stream.cached;
+  }
+
+  // Fall back to explicit AIOStreams cache markers in its formatted text.
+  const marker = [stream && stream.name, stream && stream.title, stream && stream.description]
+    .filter(Boolean)
+    .join(" ");
+  if (marker.includes("☁️") || marker.includes("☁")) return true;
+  if (/\\bnot cached\\b|\\buncached\\b/i.test(marker)) return false;
+  return null;
 }
 
 async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
@@ -50,22 +72,26 @@ async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
       }
 
       const payload = await response.json();
-      // Keep every playable Torbox result. Put explicitly cached streams first,
-      // but do not discard uncached results: Torbox may need time to download them.
-      const isCached = (stream) => {
-        const marker = [stream.name, stream.title, stream.description]
-          .filter(Boolean)
-          .join(" ");
-        return marker.includes("☁️") || marker.includes("☁");
-      };
       return Array.isArray(payload.streams)
         ? payload.streams
-            .filter((stream) => stream && stream.url)
-            .sort((a, b) => Number(isCached(b)) - Number(isCached(a)))
-            .map((stream) => ({
-              ...stream,
-              name: `${isCached(stream) ? "☁️ CACHED" : "⬇️ NOT MARKED CACHED"} · ${stream.name || "Torbox"}`
-            }))
+            .filter(hasPlayableSource)
+            .sort((a, b) => {
+              const aState = cacheState(a);
+              const bState = cacheState(b);
+              return Number(bState === true) - Number(aState === true);
+            })
+            .map((stream) => {
+              const state = cacheState(stream);
+              const label = state === true
+                ? "☁️ CACHED"
+                : state === false
+                  ? "⬇️ NOT CACHED"
+                  : "❔ CACHE UNKNOWN";
+              return {
+                ...stream,
+                name: `${label} · ${stream.name || "Torbox"}`
+              };
+            })
         : [];
     } catch (error) {
       lastError = error;
@@ -89,7 +115,7 @@ async function getStreams(tmdbId, mediaType = "movie", season = null, episode = 
     try {
       const streams = await fetchTorboxStreams(id, mediaType, season, episode);
       if (streams.length > 0) {
-        return streams.filter((stream) => stream && stream.url);
+        return streams.filter(hasPlayableSource);
       }
     } catch (error) {
       console.error(`[${PROVIDER_NAME}] ${id}: ${error.message || error}`);
