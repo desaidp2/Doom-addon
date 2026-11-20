@@ -63,13 +63,11 @@ async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
       const payload = await response.json();
       return Array.isArray(payload.streams)
         ? payload.streams
-            .filter(hasPlayableSource)
-            .sort((a, b) => Number(cacheState(b) === true) - Number(cacheState(a) === true))
-            .map((stream) => {
-              const state = cacheState(stream);
-              const label = state === true ? "☁️ CACHED" : state === false ? "⬇️ NOT CACHED" : "❔ CACHE UNKNOWN";
-              return { ...stream, name: \`\${label} · \${stream.name || "Torbox"}\` };
-            })
+            .filter((stream) => hasPlayableSource(stream) && cacheState(stream) === true)
+            .map((stream) => ({
+              ...stream,
+              name: "☁️ CACHED · " + (stream.name || "Torbox")
+            }))
         : [];
     } catch (error) {
       lastError = error;
