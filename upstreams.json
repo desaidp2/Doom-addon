@@ -5,10 +5,7 @@
     "yoruix": "https://raw.githubusercontent.com/yoruix/nuvio-providers/refs/heads/main/manifest.json",
     "flixnest": "https://flixnest.app/flix-streams/u/6p9xzp78nunz/manifest.json",
     "murph": "https://badboysxs-morpheus.hf.space/manifest.json",
-    "webstreamrmbg": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/manifest.json",
-    "torbox": "https://aiostreams.fortheweak.cloud/stremio/0f2abcc3-6334-4dc1-8852-4f1f54ee0ede/eyJpIjoiQndmYWI3aEpnUVpRZWtpZzhxaWNqdz09IiwiZSI6ImkySnV3U1p6cEtYSzZQWS9keStNYTFXdHdHdzRGMHpNRGlYTUQwRUxCWXM9IiwidCI6ImEifQ/manifest.json",
-    "torboxBackup": "https://aiostreamsfortheweebsstable.midnightignite.me/stremio/4e02e39b-c022-4ce5-ad67-eeaca6b2fb5e/eyJpIjoid0k4WWxWZnQvaVhZNnkvTjZnN2sxUT09IiwiZSI6IlU4Z0tBYUp1WnQxaGJrQTgrT1FTS3Y0OWRmbG1wQVc1NzdLV1IzRGRBUWs9IiwidCI6ImEifQ/manifest.json",
-    "pengu": "https://pengu.uk/%7B%22auth_token%22%3A%22o_3vfdJwk6Ala9JE5xNBzfU1FJqFicrxlAupcRebxV8%22%7D/manifest.json"
+    "webstreamrmbg": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/manifest.json"
   },
   "repositories": {
     "webstreamrmbg": "https://github.com/newman2x/WebStreamrMBG"
