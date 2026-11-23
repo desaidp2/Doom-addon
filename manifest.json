@@ -1,7 +1,7 @@
 {
   "id": "community.doomplug.torboxonly",
-  "version": "3.0.21",
-  "name": "Doom Torbox",
+  "version": "3.0.22",
+  "name": "Doom The Torbox",
   "description": "Torbox-only Stremio streams, with Doom-addon sorting and quality filters.",
   "resources": [
     {
