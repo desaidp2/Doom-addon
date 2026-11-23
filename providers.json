@@ -691,7 +691,7 @@
         "tv"
       ],
       "filename": "providers/pengu.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -1078,7 +1078,7 @@
         "tv"
       ],
       "filename": "providers/cncverse.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
