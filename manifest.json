@@ -1,8 +1,8 @@
 {
-  "id": "community.doomplug.pengu-cncverse-torbox",
-  "version": "3.0.10",
-  "name": "Doom — Pengu + CNCVerse + Torbox",
-  "description": "Stremio streams from Pengu, CNCVerse, and cached-only Torbox.",
+  "id": "community.doomplug.torboxonly",
+  "version": "3.0.21",
+  "name": "Doom Torbox",
+  "description": "Torbox-only Stremio streams, with Doom-addon sorting and quality filters.",
   "resources": [
     {
       "name": "stream",
