@@ -1,75 +1,69 @@
 "use strict";
 
 const PROVIDER_NAME = "Torbox";
-const API_BASE = (process.env.TORBOX_API_BASE || "https://api.torbox.app").replace(/\/+$/, "");
+// These are the previously working Torbox manifest endpoints. They provide
+// Torbox streams directly; no Torbox API key is needed by this addon.
+const DEFAULT_MANIFEST_URL = "https://aiostreams.fortheweak.cloud/stremio/0f2abcc3-6334-4dc1-8852-4f1f54ee0ede/eyJpIjoiT0xEakJYaklobC84NTJPeFlrdkNyZz09IiwiZSI6IjBlRjBuUXMwRmwrMldXbXYwYVlpODliQitlblBjUGVrN1VEd1Zsb3RBSUk9IiwidCI6ImEifQ/manifest.json";
+const BACKUP_MANIFEST_URL = "https://aiostreams.fortheweebsstable.midnightignite.me/stremio/4e02e39b-c022-4ce5-ad67-eeaca6b2fb5e/eyJpIjoid0k4WWxWZnQvaVhZNnkvTjZnN2sxUT09IiwiZSI6IlU4Z0tBYUp1WnQxaGJrQTgrT1FTS3Y0OWRmbG1wQVc1NzdLV1IzRGRBUWs9IiwidCI6ImEifQ/manifest.json";
 
 function normalizeBaseUrl(raw) {
-  return String(raw || "").replace(/\/manifest\.json$/i, "").replace(/\/+$/, "");
+  if (!raw) return "";
+  return String(raw).replace(/\\/manifest\\.json$/i, "").replace(/\\/+$/, "");
 }
+
 function manifestBaseUrls() {
   const configured = process.env.TORBOX_MANIFEST_URL || process.env.TORBOX_BASE_URL;
-  return configured ? [normalizeBaseUrl(configured)] : [];
+  const seen = new Set();
+  return [configured, DEFAULT_MANIFEST_URL, BACKUP_MANIFEST_URL]
+    .map(normalizeBaseUrl)
+    .filter((baseUrl) => baseUrl && !seen.has(baseUrl) && seen.add(baseUrl));
 }
+
 function streamId(baseId, mediaType, season, episode) {
-  if ((mediaType === "series" || mediaType === "tv") && season != null && episode != null) return `${baseId}:${season}:${episode}`;
+  if ((mediaType === "series" || mediaType === "tv") && season != null && episode != null) {
+    return `${baseId}:${season}:${episode}`;
+  }
   return baseId;
 }
-function getInfoHash(stream) {
-  const direct = stream?.infoHash || stream?.infohash || stream?.behaviorHints?.infoHash;
-  if (typeof direct === "string" && /^[a-f0-9]{40}$/i.test(direct)) return direct.toLowerCase();
-  const magnet = [stream?.url, stream?.externalUrl].find((value) => typeof value === "string" && value.startsWith("magnet:?"));
-  const match = magnet && magnet.match(/[?&]xt=urn:btih:([a-f0-9]{40}|[a-z2-7]{32})/i);
-  return match ? match[1].toLowerCase() : "";
-}
-async function cachedHashes(hashes) {
-  const apiKey = String(process.env.TORBOX_API_KEY || "").trim();
-  if (!apiKey || hashes.length === 0) return new Set();
-  const response = await fetch(`${API_BASE}/v1/api/torrents/checkcached?format=object&${hashes.map((hash) => `hash=${encodeURIComponent(hash)}`).join("&")}`, {
-    headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
-    signal: AbortSignal.timeout(12000)
-  });
-  if (!response.ok) throw new Error(`Torbox cache check returned HTTP ${response.status}`);
-  const payload = await response.json();
-  if (payload?.success !== true || !payload.data || typeof payload.data !== "object") return new Set();
-  return new Set(Object.keys(payload.data).filter((hash) => payload.data[hash]).map((hash) => hash.toLowerCase()));
-}
+
 async function fetchTorboxStreams(stremioId, mediaType, season, episode) {
   if (!stremioId) return [];
-  const baseUrls = manifestBaseUrls();
-  if (!baseUrls.length) return [];
   const type = mediaType === "tv" ? "series" : mediaType;
   const id = streamId(stremioId, type, season, episode);
   let lastError = null;
-  for (const baseUrl of baseUrls) {
+
+  for (const baseUrl of manifestBaseUrls()) {
     try {
       const response = await fetch(`${baseUrl}/stream/${encodeURIComponent(type)}/${encodeURIComponent(id)}.json`, {
         headers: { Accept: "application/json", "User-Agent": "Doom-addon/3.0" },
+        redirect: "follow",
         signal: AbortSignal.timeout(20000)
       });
-      if (!response.ok) throw new Error(`Torbox manifest returned HTTP ${response.status}`);
+      if (!response.ok) throw new Error(`${PROVIDER_NAME} returned HTTP ${response.status}`);
       const payload = await response.json();
-      return Array.isArray(payload.streams) ? payload.streams.filter((stream) => stream && stream.url) : [];
-    } catch (error) { lastError = error; }
+      const streams = Array.isArray(payload.streams) ? payload.streams.filter((stream) => stream && stream.url) : [];
+      if (streams.length) return streams;
+    } catch (error) {
+      lastError = error;
+      console.error(`[${PROVIDER_NAME}] ${baseUrl}: ${error.message || error}`);
+    }
   }
+
   if (lastError) throw lastError;
   return [];
 }
+
 async function getStreams(tmdbId, mediaType = "movie", season = null, episode = null, imdbId = "") {
-  if (!process.env.TORBOX_API_KEY) {
-    console.warn("[Torbox] TORBOX_API_KEY is not configured; returning no streams (cached-only mode).");
-    return [];
-  }
   const ids = [imdbId, tmdbId ? `tmdb:${tmdbId}` : ""].filter(Boolean);
   for (const id of ids) {
     try {
       const streams = await fetchTorboxStreams(id, mediaType, season, episode);
-      if (!streams.length) continue;
-      const withHashes = streams.map((stream) => ({ stream, hash: getInfoHash(stream) })).filter((item) => item.hash);
-      const hashes = [...new Set(withHashes.map((item) => item.hash))];
-      const cached = await cachedHashes(hashes);
-      return withHashes.filter((item) => cached.has(item.hash)).map((item) => item.stream);
-    } catch (error) { console.error(`[${PROVIDER_NAME}] ${id}: ${error.message || error}`); }
+      if (streams.length) return streams;
+    } catch (error) {
+      console.error(`[${PROVIDER_NAME}] ${id}: ${error.message || error}`);
+    }
   }
   return [];
 }
+
 module.exports = { getStreams };
