@@ -134,7 +134,7 @@ const PROVIDER_MODE = process.env.DOOM_PROVIDER_MODE || (process.env.DOOM_EXCLUD
 const addonIdentity = {
   lite: { id: "community.doomplug.lite", name: "Doom Lite" },
   flix: { id: "community.doomplug.flixstreams", name: "Doom FlixStreams" },
-  torbox: { id: "community.doomplug.torboxonly", name: "Doom Torbox" }
+  torbox: { id: "community.doomplug.torboxonly", name: "Doom The Torbox" }
 }[PROVIDER_MODE];
 if (addonIdentity) {
   manifest.id = addonIdentity.id;
