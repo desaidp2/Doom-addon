@@ -13,7 +13,7 @@
         "tv"
       ],
       "filename": "providers/4khdhub.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "m3u8"
@@ -34,7 +34,7 @@
         "tv"
       ],
       "filename": "providers/4khdhub_tv.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "m3u8"
@@ -55,7 +55,7 @@
         "tv"
       ],
       "filename": "providers/4khdhub_yoruix.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "m3u8"
@@ -76,7 +76,7 @@
         "tv"
       ],
       "filename": "providers/hdhub4u.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "m3u8"
@@ -97,7 +97,7 @@
         "tv"
       ],
       "filename": "providers/hdhub4u_murph.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -120,7 +120,7 @@
         "tv"
       ],
       "filename": "providers/moviebox_murph.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -143,7 +143,7 @@
         "tv"
       ],
       "filename": "providers/movies4u_murph.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -166,7 +166,7 @@
         "tv"
       ],
       "filename": "providers/hdhub4u_yoruix.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -189,7 +189,7 @@
         "tv"
       ],
       "filename": "providers/moviebox_yoruix.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mpd"
@@ -234,7 +234,7 @@
         "tv"
       ],
       "filename": "providers/uhdmovies_yoruix.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -257,7 +257,7 @@
         "tv"
       ],
       "filename": "providers/movieblast_yoruix.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -279,7 +279,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_emby.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -302,7 +302,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_mkvcinemas.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -325,7 +325,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_lotusvault.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -348,7 +348,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_archivevault.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -371,7 +371,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_uhdmovies.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -394,7 +394,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_4khdhub.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -417,7 +417,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_hdhub4u.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -440,7 +440,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_debridvault.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -463,7 +463,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_signalvault.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -486,7 +486,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_usenetvault.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -509,7 +509,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_streamvault.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -532,7 +532,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_other.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -555,7 +555,7 @@
         "tv"
       ],
       "filename": "providers/flix_streams_vegamovies.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -578,7 +578,7 @@
         "tv"
       ],
       "filename": "providers/cinefreak.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mkv",
         "mp4"
@@ -600,7 +600,7 @@
         "tv"
       ],
       "filename": "providers/fibwatch.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mkv",
         "m3u8"
@@ -622,7 +622,7 @@
         "tv"
       ],
       "filename": "providers/playimdb.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -645,7 +645,7 @@
         "tv"
       ],
       "filename": "providers/webstreamrmbg.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -759,7 +759,7 @@
         "tv"
       ],
       "filename": "providers/hindmoviez.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -782,7 +782,7 @@
         "tv"
       ],
       "filename": "providers/movieblast.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -807,7 +807,7 @@
         "tv"
       ],
       "filename": "providers/4khdhub_murph.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -853,7 +853,7 @@
         "tv"
       ],
       "filename": "providers/4khdhubnew.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -876,7 +876,7 @@
         "tv"
       ],
       "filename": "providers/movieboxhindi.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -898,7 +898,7 @@
         "tv"
       ],
       "filename": "providers/movies4u.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -921,7 +921,7 @@
         "tv"
       ],
       "filename": "providers/uhdmovies.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -944,7 +944,7 @@
         "tv"
       ],
       "filename": "providers/moviesdrive.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -990,7 +990,7 @@
         "tv"
       ],
       "filename": "providers/peachify.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -1013,7 +1013,7 @@
         "tv"
       ],
       "filename": "providers/vegamovies.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "mkv",
@@ -1036,7 +1036,7 @@
         "tv"
       ],
       "filename": "providers/vidlink.js",
-      "enabled": true,
+      "enabled": false,
       "formats": [
         "mp4",
         "m3u8"
@@ -1065,6 +1065,29 @@
       "logo": "https://i.postimg.cc/4yVjQjpH/streamflix.png",
       "contentLanguage": [
         "en"
+      ]
+    },
+    {
+      "id": "cncverse",
+      "name": "CNCVerse Bridge",
+      "description": "CNCVerse English and Hindi streams",
+      "version": "1.0.0",
+      "author": "CNCVerse",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/cncverse.js",
+      "enabled": true,
+      "formats": [
+        "mp4",
+        "mkv",
+        "m3u8"
+      ],
+      "logo": "https://i.postimg.cc/9QZLkH7f/umbrella.png",
+      "contentLanguage": [
+        "en",
+        "hi"
       ]
     }
   ]
