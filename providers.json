@@ -681,28 +681,6 @@
       ]
     },
     {
-      "id": "pengu",
-      "name": "Pengu",
-      "description": "PenguPlay streams verified for playback and seeking before Doom-addon returns them",
-      "version": "1.0.0",
-      "author": "PenguPlay/ummarm",
-      "supportedTypes": [
-        "movie",
-        "tv"
-      ],
-      "filename": "providers/pengu.js",
-      "enabled": false,
-      "formats": [
-        "mp4",
-        "mkv",
-        "m3u8"
-      ],
-      "logo": "https://pengu.uk/penguplay-icon.png",
-      "contentLanguage": [
-        "multi"
-      ]
-    },
-    {
       "id": "mediafusion",
       "name": "MediaFusion",
       "description": "Streams wrapped from the configured MediaFusion add-on",
@@ -1065,29 +1043,6 @@
       "logo": "https://i.postimg.cc/4yVjQjpH/streamflix.png",
       "contentLanguage": [
         "en"
-      ]
-    },
-    {
-      "id": "cncverse",
-      "name": "CNCVerse Bridge",
-      "description": "CNCVerse English and Hindi streams",
-      "version": "1.0.0",
-      "author": "CNCVerse",
-      "supportedTypes": [
-        "movie",
-        "tv"
-      ],
-      "filename": "providers/cncverse.js",
-      "enabled": false,
-      "formats": [
-        "mp4",
-        "mkv",
-        "m3u8"
-      ],
-      "logo": "https://i.postimg.cc/9QZLkH7f/umbrella.png",
-      "contentLanguage": [
-        "en",
-        "hi"
       ]
     }
   ]
