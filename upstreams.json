@@ -5,7 +5,8 @@
     "yoruix": "https://raw.githubusercontent.com/yoruix/nuvio-providers/refs/heads/main/manifest.json",
     "flixnest": "https://flixnest.app/flix-streams/u/6p9xzp78nunz/manifest.json",
     "murph": "https://badboysxs-morpheus.hf.space/manifest.json",
-    "webstreamrmbg": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/manifest.json"
+    "webstreamrmbg": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club/manifest.json",
+    "cncverse": "https://cncverse.dpdns.org/u/p_r60arutz8zns/manifest.json"
   },
   "repositories": {
     "webstreamrmbg": "https://github.com/newman2x/WebStreamrMBG"
