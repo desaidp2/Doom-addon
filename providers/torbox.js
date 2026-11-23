@@ -8,7 +8,7 @@ const BACKUP_MANIFEST_URL = "https://aiostreams.fortheweebsstable.midnightignite
 
 function normalizeBaseUrl(raw) {
   if (!raw) return "";
-  return String(raw).replace(/\\/manifest\\.json$/i, "").replace(/\\/+$/, "");
+  return String(raw).replace(/\/manifest\.json$/i, "").replace(/\/+$/, "");
 }
 
 function manifestBaseUrls() {
